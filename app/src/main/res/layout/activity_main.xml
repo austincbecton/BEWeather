@@ -21,6 +21,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/cardView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="25dp"
@@ -69,5 +70,25 @@
         </RelativeLayout>
 
     </androidx.cardview.widget.CardView>
+
+    <Button
+        android:id="@+id/update_weather_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Update"
+        app:layout_constraintEnd_toEndOf="@+id/cardView"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="@+id/cardView"
+        app:layout_constraintTop_toBottomOf="@+id/cardView" />
+
+    <Button
+        android:id="@+id/update_screen_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Screen"
+        app:layout_constraintEnd_toEndOf="@+id/update_weather_button"
+        app:layout_constraintStart_toStartOf="@+id/update_weather_button"
+        app:layout_constraintTop_toBottomOf="@+id/update_weather_button" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

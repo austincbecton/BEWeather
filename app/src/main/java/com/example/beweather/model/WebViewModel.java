@@ -1,5 +1,8 @@
 package com.example.beweather.model;
 import android.content.Context;
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
 import androidx.lifecycle.ViewModel;
 import com.example.beweather.weathercontroller.Controller;
 import com.example.beweather.weatherdata.ReportCache;
@@ -20,9 +23,16 @@ public class WebViewModel extends ViewModel {
         return reportCache.getNextLocation();
     }
 
+    public WeatherReport getCurrentWeatherReport() {return reportCache.getCurrentLocation();}
+
 
     public void addWeatherReport(WeatherReport newReport) {
         reportCache.addReport(newReport);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void saveReportCache() {
+        reportCache.sharedPreferences_handler_addAllReports();
     }
 
 

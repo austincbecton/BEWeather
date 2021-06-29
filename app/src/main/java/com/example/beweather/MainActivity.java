@@ -1,12 +1,15 @@
 package com.example.beweather;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.nfc.Tag;
+import android.os.Build;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,86 +28,74 @@ import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView currentLocation_temperature;
+
     Controller controller;
     SharedPreferences sharedPref;
     WebViewModel model;
+    Button update_weather_button;
+    Button update_screen_button;
+    TextView currentLocation_temperature;
+    TextView currentLocationName_cardView;
     public static String GLOBAL_SHARED_PREFERENCES = "global_shared_preferences";
 
 
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
 
+        //get utilities set up
         model = new WebViewModel(this);
         sharedPref = getSharedPreferences(MainActivity.GLOBAL_SHARED_PREFERENCES, Context.MODE_PRIVATE);
         controller = Controller.getController(this);
 
+
+        //Sets the weather display items
+        setWeatherDisplay(model.getCurrentWeatherReport());
+
+
+        //get the most recently searched-for weather, if it exists
+        if (model.getCurrentWeatherReport() != null) {
+
+        }
+
+
+
+
+
+        update_weather_button = findViewById(R.id.update_weather_button);
+        update_weather_button.setOnClickListener(View -> {
+
+            controller.submitRequest("Dayton, OH", model);
+            model.saveReportCache();
+
+
+        });
+
+        update_screen_button = findViewById(R.id.update_screen_button);
+        update_screen_button.setOnClickListener(View -> {
+            currentLocation_temperature.setText(model.getCurrentWeatherReport().getTemperature());
+            System.out.println(model.getCurrentWeatherReport().getTemperature());
+            currentLocationName_cardView.setText(model.getCurrentWeatherReport().getLocationName_city());
+            System.out.println(model.getCurrentWeatherReport().getLocationName_city());
+
+        });
+
+    }
+
+
+
+    public void setWeatherDisplay(WeatherReport currentWeatherReport) {
         currentLocation_temperature = findViewById(R.id.currentLocation_temperature);
-        submitRequest("Dayton, OH");
-    }
+        currentLocationName_cardView = findViewById(R.id.currentLocationName_cardView);
 
-
-
-    public void submitRequest(String location) {
-        //String weatherUrl = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/" + location + "?key=QZ2CJDXT7CYASXM6598KXSPDX";
-        String weatherUrl = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/%22%20+%20location%20+%20%22?key=QZ2CJDXT7CYASXM6598KXSPDX";
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.GET, weatherUrl, null, new Response.Listener<JSONObject>() {
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-                            String cityName = "";
-                            String regionName = null;
-                            String countryName = null;
-
-                            String time = "";
-                            String temperature = "";
-                            String skyCondition = "";
-                            String humidity = "";
-
-                        try {
-                            cityName = response.getString("resolvedAddress");
-                        } catch (JSONException e) {
-                            System.out.println("Error gathering cityName");
-                        }
-                        try {
-                            time = response.getJSONObject("currentConditions").getString("datetime");
-                            //time = response.getJSONArray("days").getJSONObject(0).getString("datetime");
-                        }catch (JSONException e) {
-                            System.out.println("Error gathering time");
-                        }
-                        try {
-                            temperature = response.getJSONObject("currentConditions").getString("temp");
-                            //temperature = response.getJSONArray("days").getJSONObject(0).getString("temp");
-                        }catch (JSONException e) {
-                            System.out.println("Error gathering temperature");
-                        }
-                        try {
-
-                        }
-
-                        try {
-                            humidity = response.getJSONObject("currentConditions").getString("temp");
-                        }
-
-                        WeatherReport newReport = new WeatherReport(cityName, regionName, countryName);
-                        newReport.updateWeatherReport(time, temperature, null, null);
-                        model.addWeatherReport(newReport);
-
-
-
-                    }
-                }, error -> System.out.println("ERROR GETTING WEATHER"));
-
-
-        // Access the RequestQueue through your singleton class.
-        controller.addToRequestQueue(jsonObjectRequest);
-
+        currentLocation_temperature.setText(currentWeatherReport.getTemperature());
+        currentLocationName_cardView.setText(currentWeatherReport.getLocationName_city());
 
     }
+
+
 }
