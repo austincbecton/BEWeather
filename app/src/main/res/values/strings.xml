@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">BEWeather</string>
+    <string name="currentLocation_hint">Choose a Location</string>
+</resources>
