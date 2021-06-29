@@ -2,7 +2,10 @@ package com.example.beweather.weathercontroller;
 
 import android.app.Application;
 import android.content.Context;
+import android.os.Build;
 import android.text.TextUtils;
+
+import androidx.annotation.RequiresApi;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -76,6 +79,7 @@ public class Controller  {
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, weatherUrl, null, new Response.Listener<JSONObject>() {
 
+                    @RequiresApi(api = Build.VERSION_CODES.N)
                     @Override
                     public void onResponse(JSONObject response) {
                         String cityName = "";
@@ -140,6 +144,9 @@ public class Controller  {
     }
 
     private void location_splicer(String fullLocation) {
+
+        cityName_holder = "";
+        countryName_holder = "";
         boolean city = true;
 
         // loop through each element using for-each loop

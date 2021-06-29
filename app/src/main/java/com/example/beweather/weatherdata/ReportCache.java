@@ -40,7 +40,7 @@ public class ReportCache {
     }
 
     public void addReport(WeatherReport newReport) {
-        if (recentReports.size()>5) {
+        if (recentReports.size()>4) {
             recentReports.add(0, newReport);
             recentReports.remove(4);
         } else {
@@ -69,8 +69,9 @@ public class ReportCache {
     public WeatherReport getNextLocation() {
         WeatherReport nextLocation_report;
         try {
-            nextLocation_report = recentReports.get(nextLocation);
-            nextLocation = nextLocation + 1;
+            nextLocation_report = recentReports.get(0);
+            recentReports.add(recentReports.get(0));
+            recentReports.remove(0);
 
         }catch (Exception e) {
             return null;
@@ -84,6 +85,7 @@ public class ReportCache {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void sharedPreferences_handler_addAllReports() {
+
         Integer i = 1;
         for (WeatherReport report : recentReports) {
             report.saveToSharedPreferences(context,i.toString());
@@ -94,6 +96,23 @@ public class ReportCache {
 
     public void sharedPreferences_handler_addSingleReport(String reportNum, WeatherReport report) {
         report.saveToSharedPreferences(context, reportNum);
+    }
+
+
+    //To see how data is saved in sharedpreferences, see WeatherReport.java
+    public void syncReportCacheWithSharedPreferences() {
+
+        //first, clear the cache
+        getReportCache(context).clearCache();
+
+        for (int i = 0; i < 6; i++) {
+            if (sharedPref.getString("report"+ i, null) != null) {
+                WeatherReport temporaryReport = new WeatherReport(null, null);
+                temporaryReport.matchWithSharedPreferences(context, String.valueOf(i));
+                getReportCache(context).addReport(temporaryReport);
+
+            }
+        }
     }
 
 

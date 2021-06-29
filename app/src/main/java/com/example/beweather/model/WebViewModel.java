@@ -16,6 +16,7 @@ public class WebViewModel extends ViewModel {
 
     public WebViewModel(Context context) {
         reportCache = ReportCache.getReportCache(context);
+
     }
 
 
@@ -26,8 +27,10 @@ public class WebViewModel extends ViewModel {
     public WeatherReport getCurrentWeatherReport() {return reportCache.getCurrentLocation();}
 
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void addWeatherReport(WeatherReport newReport) {
         reportCache.addReport(newReport);
+        saveReportCache();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -35,6 +38,10 @@ public class WebViewModel extends ViewModel {
         reportCache.sharedPreferences_handler_addAllReports();
     }
 
+
+    public void syncReportCache() {
+        //reportCache.syncReportCacheWithSharedPreferences();
+    }
 
 
 
