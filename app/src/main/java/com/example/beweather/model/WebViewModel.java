@@ -40,7 +40,7 @@ public class WebViewModel extends ViewModel {
 
 
     public void syncReportCache() {
-        //reportCache.syncReportCacheWithSharedPreferences();
+        reportCache.syncReportCacheWithSharedPreferences();
     }
 
 

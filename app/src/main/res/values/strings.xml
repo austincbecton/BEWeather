@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">BEWeather</string>
     <string name="currentLocation_hint">Choose a Location</string>
+    <string name="no_city_chosen">Unknown City</string>
 </resources>

@@ -2,30 +2,22 @@ package com.example.beweather;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 
-import android.app.Application;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.beweather.model.WebViewModel;
 import com.example.beweather.weathercontroller.Controller;
 import com.example.beweather.weatherdata.WeatherReport;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,10 +27,12 @@ public class MainActivity extends AppCompatActivity {
     WebViewModel model;
     Button update_weather_button;
     Button update_screen_button;
+    CardView cardView_1;
     TextView currentLocation_temperature;
     TextView currentLocationName_cardView;
     EditText weatherSearchBar;
     Button enterWeatherButton;
+    ObjectAnimator objectAnimator;
     public static String GLOBAL_SHARED_PREFERENCES = "global_shared_preferences";
 
 
@@ -61,12 +55,13 @@ public class MainActivity extends AppCompatActivity {
 
         //get the most recently searched-for weather, if it exists
         if (model.getCurrentWeatherReport() != null) {
-            //Sets the weather display items
-            setWeatherDisplay(model.getCurrentWeatherReport());
+            //Nothing, just set the weather display items
+        } else if (sharedPref.getString("report1",null) != null) {
+            model.syncReportCache();
         } else {
             controller.submitRequest("Dayton, OH", model);
-            setWeatherDisplay(model.getCurrentWeatherReport());
         }
+        setWeatherDisplay(model.getCurrentWeatherReport());
 
         //Set up views
         weatherSearchBar = findViewById(R.id.currentLocationName_searchbar);
@@ -125,22 +120,37 @@ public class MainActivity extends AppCompatActivity {
         update_screen_button = findViewById(R.id.update_screen_button);
         update_screen_button.setOnClickListener(View -> {
 
-            model.saveReportCache();
+
+            cardView_1 = findViewById(R.id.cardView);
+            objectAnimator = ObjectAnimator.ofFloat(cardView_1, "x", -600);
+            objectAnimator.setDuration(2000);
+            objectAnimator.start();
+
+            Animation fade = new AlphaAnimation(1.f, 0.f);
+            fade.setDuration(1000);
+            cardView_1.startAnimation(fade);
+            cardView_1.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    cardView_1.setVisibility(android.view.View.INVISIBLE);
+                }
+            }, 1000);
 
 
-
-            //REAL CODE BELOW:
             /*
+
             currentLocation_temperature.setText(model.getCurrentWeatherReport().getTemperature());
             currentLocationName_cardView.setText(model.getCurrentWeatherReport().getLocationName_city());
 
              */
 
+
+
         });
 
-        //TESTING
-        //String city_name = sharedPref.getString("report1", null);
-        //System.out.println(city_name);
+
+
+
 
     }
 
