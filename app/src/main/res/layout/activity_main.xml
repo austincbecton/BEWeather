@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/parentLayout"
     android:background="@drawable/default_background"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -20,6 +21,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <Button
+        android:id="@+id/newWeatherBoxButton"
+        android:layout_width="306dp"
+        android:layout_height="113dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginBottom="7dp"
+        android:background="#2400FFD4"
+        app:layout_constraintBottom_toBottomOf="@+id/cardView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/cardView" />
+
+
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
         android:layout_width="wrap_content"
@@ -33,6 +48,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <RelativeLayout
+            android:id="@+id/relativeLayoutInCardView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="#00FFFFFF">
@@ -104,5 +120,7 @@
         app:layout_constraintEnd_toEndOf="@+id/currentLocationName_searchbar"
         app:layout_constraintTop_toTopOf="@+id/currentLocationName_searchbar"
         app:layout_constraintVertical_bias="1.0" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

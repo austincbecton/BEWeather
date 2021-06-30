@@ -27,12 +27,12 @@ public class MainActivity extends AppCompatActivity {
     WebViewModel model;
     Button update_weather_button;
     Button update_screen_button;
-    CardView cardView_1;
     TextView currentLocation_temperature;
     TextView currentLocationName_cardView;
     EditText weatherSearchBar;
     Button enterWeatherButton;
-    ObjectAnimator objectAnimator;
+    Button newWeatherBoxButton;
+
     public static String GLOBAL_SHARED_PREFERENCES = "global_shared_preferences";
 
 
@@ -64,6 +64,9 @@ public class MainActivity extends AppCompatActivity {
         setWeatherDisplay(model.getCurrentWeatherReport());
 
         //Set up views
+        newWeatherBoxButton = findViewById(R.id.newWeatherBoxButton);
+        newWeatherBoxButton.setVisibility(View.INVISIBLE);
+
         weatherSearchBar = findViewById(R.id.currentLocationName_searchbar);
         enterWeatherButton = findViewById(R.id.enter_weather_button);
         enterWeatherButton.setOnClickListener(View -> {
@@ -120,24 +123,11 @@ public class MainActivity extends AppCompatActivity {
         update_screen_button = findViewById(R.id.update_screen_button);
         update_screen_button.setOnClickListener(View -> {
 
-
-            cardView_1 = findViewById(R.id.cardView);
-            objectAnimator = ObjectAnimator.ofFloat(cardView_1, "x", -600);
-            objectAnimator.setDuration(2000);
-            objectAnimator.start();
-
-            Animation fade = new AlphaAnimation(1.f, 0.f);
-            fade.setDuration(1000);
-            cardView_1.startAnimation(fade);
-            cardView_1.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    cardView_1.setVisibility(android.view.View.INVISIBLE);
-                }
-            }, 1000);
+            WeatherDisplayPresets weatherDisplayPresets = new WeatherDisplayPresets();
+            weatherDisplayPresets.exitAnimation(this);
 
 
-            /*
+                   /*
 
             currentLocation_temperature.setText(model.getCurrentWeatherReport().getTemperature());
             currentLocationName_cardView.setText(model.getCurrentWeatherReport().getLocationName_city());
