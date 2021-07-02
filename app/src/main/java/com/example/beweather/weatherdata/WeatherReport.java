@@ -15,6 +15,10 @@ public class WeatherReport {
     private String temperature;
     private String skyCondition;
     private String humidity;
+    private String maxTemp;
+    private String minTemp;
+    private String tomorrow;
+    private String tonight;
 
     public WeatherReport(String city, String country) {
         this.locationName_city = city;
@@ -23,14 +27,22 @@ public class WeatherReport {
         this.temperature = null;
         this.skyCondition = null;
         this.humidity = null;
+        this.maxTemp = null;
+        this.minTemp = null;
+        this.tomorrow = null;
+        this.tonight = null;
     }
 
 
-    public void updateWeatherReport(String time, String temperature, String skyCondition, String humidity) {
+    public void updateWeatherReport(String time, String temperature, String skyCondition, String humidity, String maxTemp, String minTemp, String tomorrow, String tonight) {
         this.time = time;
         this.temperature = temperature;
         this.skyCondition = skyCondition;
         this.humidity = humidity;
+        this.maxTemp = maxTemp;
+        this.minTemp = minTemp;
+        this.tomorrow = tomorrow;
+        this.tonight = tonight;
 
     }
 
@@ -58,8 +70,21 @@ public class WeatherReport {
         return humidity;
     }
 
+    public String getMaxTemp() {
+        return maxTemp;
+    }
 
+    public String getMinTemp() {
+        return minTemp;
+    }
 
+    public String getTomorrow() {
+        return tomorrow;
+    }
+
+    public String getTonight() {
+        return tonight;
+    }
 
     //report_save_number will help us identify this recent save
     public void saveToSharedPreferences(Context context, String report_save_number) {
@@ -83,6 +108,10 @@ public class WeatherReport {
             editor.remove(report_TAG + "temperature");
             editor.remove(report_TAG + "skyCondition");
             editor.remove(report_TAG + "humidity");
+            editor.remove(report_TAG + "maxTemp");
+            editor.remove(report_TAG + "minTemp");
+            editor.remove(report_TAG + "tonight");
+            editor.remove(report_TAG + "tomorrow");
             editor.apply();
         }
 
@@ -104,6 +133,10 @@ public class WeatherReport {
         editor.putString(report_TAG +"temperature", getTemperature());
         editor.putString(report_TAG +"skyCondition", getSkyCondition());
         editor.putString(report_TAG +"humidity", getHumidity());
+        editor.putString(report_TAG + "maxTemp", getMaxTemp());
+        editor.putString(report_TAG + "minTemp", getMinTemp());
+        editor.putString(report_TAG + "tonight", getTonight());
+        editor.putString(report_TAG + "tomorrow", getTomorrow());
         editor.apply();
 
     }
@@ -118,13 +151,15 @@ public class WeatherReport {
         String temperature = sharedPref.getString(report_TAG +"temperature", null);
         String skyCondition = sharedPref.getString(report_TAG +"skyCondition", null);
         String humidity = sharedPref.getString(report_TAG +"humidity", null);
+        String maxTemp = sharedPref.getString(report_TAG+ "maxTemp", null);
+        String minTemp = sharedPref.getString(report_TAG+ "minTemp", null);
+        String tomorrow = sharedPref.getString(report_TAG+ "tomorrow", null);
+        String tonight = sharedPref.getString(report_TAG+ "tonight", null);
 
         this.locationName_city = city;
         this.locationName_country = country;
 
-        updateWeatherReport(time, temperature, skyCondition, humidity);
-
-
+        updateWeatherReport(time, temperature, skyCondition, humidity, maxTemp, minTemp, tomorrow, tonight);
 
     }
 

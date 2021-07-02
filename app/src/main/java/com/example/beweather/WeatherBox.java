@@ -94,7 +94,6 @@ public class WeatherBox {
                 currentLocation_name.setText(location);
             } else {
 
-
                 try {
                     System.out.println("THIS CITY IS: " +
                             model.getCurrentWeatherReport().getLocationName_city());
@@ -125,18 +124,17 @@ public class WeatherBox {
                 weatherBoxDetailsView.removeAllViews();
                 weatherBoxDetailsView.alterViewLayout_standardView(context);
                 nowDisplayingDetails = false;
-
                 //Set weather details
                 weatherBoxDetailsView.getWeatherViews_location().setText(getThisWeatherReport().getLocationName_city());
                 weatherBoxDetailsView.getWeatherViews_temperature().setText(getThisWeatherReport().getTemperature());
-
+                weatherBoxDetailsView.getWeatherViews_humidity().setText(getThisWeatherReport().getHumidity());
+                weatherBoxDetailsView.getWeatherViews_conditions().setText(getThisWeatherReport().getSkyCondition());
 
             } else {
                 weatherBoxDetailsView.removeAllViews();
                 //weatherBoxDetailsView.setUpView(context);
                 weatherBoxDetailsView.alterViewLayout_detailView(context);
                 nowDisplayingDetails = true;
-
                 //Set weather details
                 weatherBoxDetailsView.getWeatherViews_cityName().setText(getThisWeatherReport().getLocationName_city());
                 weatherBoxDetailsView.getWeatherViews_conditions().setText(getThisWeatherReport().getSkyCondition());

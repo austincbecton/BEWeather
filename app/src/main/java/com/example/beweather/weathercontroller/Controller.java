@@ -16,8 +16,15 @@ import com.android.volley.toolbox.Volley;
 import com.example.beweather.model.WebViewModel;
 import com.example.beweather.weatherdata.WeatherReport;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.lang.reflect.Array;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class Controller  {
 
@@ -84,11 +91,17 @@ public class Controller  {
                     public void onResponse(JSONObject response) {
                         String cityName = "";
                         String countryName = "";
-
                         String time = "";
                         String temperature = "";
+                        String maxTemp = "";
+                        String minTemp = "";
                         String skyCondition = "";
                         String humidity = "";
+                        String tomorrow = "";
+                        String tonight = "";
+                        JSONArray daysArray;
+                        SimpleDateFormat dateProperFormat;
+
                         try {
                             location_splicer(response.getString("resolvedAddress"));
                         } catch(JSONException e) {
@@ -104,14 +117,31 @@ public class Controller  {
                         } catch (Exception e) {
                             System.out.println("Error gathering countryName");
                         }
+
+                        //Let's get weather objects for each day.
                         try {
-                            time = response.getJSONObject("currentConditions").getString("datetime");
-                            //time = response.getJSONArray("days").getJSONObject(0).getString("datetime");
+                            daysArray = response.getJSONArray("days");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            daysArray = null;
+                            System.out.println("ERROR DAYSARRAY");
+                        }
+
+                        try {
+                            Date currentTime = Calendar.getInstance().getTime();
+                            Locale locale = Locale.getDefault();
+                            dateProperFormat =
+                                    new SimpleDateFormat ("yyyy-MM-dd", locale);
+
+                            time = daysArray.getJSONObject(0).getString("datetime");
+
                         }catch (JSONException e) {
                             System.out.println("Error gathering time");
                         }
+
                         try {
-                            temperature = response.getJSONObject("currentConditions").getString("temp");
+                            temperature = daysArray.getJSONObject(0).getString("temp");
+                            //temperature = response.getJSONObject("currentConditions").getString("temp");
                             if (temperature.length() > 2) {
                                 temperature = temperature.substring(0,2);
                             }
@@ -120,18 +150,57 @@ public class Controller  {
                             System.out.println("Error gathering temperature");
                         }
                         try {
-                            skyCondition = response.getJSONObject("currentConditions").getString("conditions");
+                            maxTemp = daysArray.getJSONObject(0).getString("tempmax");
+                        } catch (JSONException e) {
+                            System.out.println("Error getting max temperature");
+                        }
+                        try {
+                            minTemp = daysArray.getJSONObject(0).getString("tempmin");
+                        } catch (JSONException e) {
+                            System.out.println("Error getting max temperature");
+                        }
+                        try {
+                            skyCondition = daysArray.getJSONObject(0).getString("icon");
+
+                                    //response.getJSONObject("currentConditions").getString("conditions");
                         } catch (JSONException e) {
                             System.out.println("Error gathering conditions");
                         }
                         try {
-                            humidity = response.getJSONObject("currentConditions").getString("humidity");
+                            humidity = daysArray.getJSONObject(0).getString("humidity");
                         } catch (JSONException e) {
                             System.out.println("Error gathering humidity");
                         }
+                        try {
+                            JSONArray hours = daysArray.getJSONObject(0).getJSONArray("hours");
+                            tonight = "unknown";
+                            for (int i = 0; i < hours.length(); i++) {
+                                if (hours.getJSONObject(i).getString("datetime").equals("23:00:00")) {
+                                    tonight = hours.getJSONObject(i).getString("temp");
+                                }
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        try {
+                            tomorrow = daysArray.getJSONObject(1).getString("tempmax");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+
+                        System.out.println("***JSON DATA***");
+                        System.out.println(time);
+                        System.out.println(cityName);
+                        System.out.println(countryName);
+                        System.out.println(temperature);
+                        System.out.println(skyCondition);
+                        System.out.println(humidity);
+
 
                         WeatherReport newReport = new WeatherReport(cityName, countryName);
-                        newReport.updateWeatherReport(time, temperature, skyCondition, humidity);
+                        newReport.updateWeatherReport(time, temperature, skyCondition, humidity, maxTemp, minTemp, tomorrow, tonight);
                         vmodel.addWeatherReport(newReport);
 
                     }
