@@ -1,42 +1,84 @@
 package com.example.beweather;
 
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.Constraints;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GestureDetectorCompat;
+import androidx.core.view.MotionEventCompat;
+import androidx.transition.Transition;
+import androidx.transition.TransitionValues;
 
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.GestureDetector;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import com.example.beweather.model.WebViewModel;
 import com.example.beweather.weathercontroller.Controller;
 import com.example.beweather.weatherdata.WeatherReport;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class MainActivity extends AppCompatActivity {
 
 
-    Controller controller;
+    public Controller controller;
     SharedPreferences sharedPref;
     WebViewModel model;
     Button update_weather_button;
     Button update_screen_button;
-    TextView currentLocation_temperature;
-    TextView currentLocationName_cardView;
     EditText weatherSearchBar;
     Button enterWeatherButton;
-    Button newWeatherBoxButton;
 
+
+
+    Button newWeatherBoxButton_1;
+    Button newWeatherBoxButton_2;
+    Button newWeatherBoxButton_3;
+
+    ImageView addButton_1;
+    ImageView addButton_2;
+    ImageView addButton_3;
+
+    WeatherBoxDetailsView weatherBoxView1;
+    WeatherBoxDetailsView weatherBoxView2;
+    WeatherBoxDetailsView weatherBoxView3;
+
+
+    WeatherBox weatherBox1;
+    WeatherBox weatherBox2;
+    WeatherBox weatherBox3;
+
+
+
+    private ExecutorService backgroundThread = Executors.newSingleThreadExecutor();
     public static String GLOBAL_SHARED_PREFERENCES = "global_shared_preferences";
 
 
 
+    @SuppressLint({"ClickableViewAccessibility", "NewApi"})
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,8 +91,10 @@ public class MainActivity extends AppCompatActivity {
         sharedPref = getSharedPreferences(MainActivity.GLOBAL_SHARED_PREFERENCES, Context.MODE_PRIVATE);
         controller = Controller.getController(this);
         model.syncReportCache();
-
-
+        Window window = this.getWindow();
+        window.setStatusBarColor(ContextCompat.getColor(this,R.color.clear));
+        WindowInsetsController windowControls = window.getInsetsController();
+        windowControls.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_BARS_BY_TOUCH);
 
 
         //get the most recently searched-for weather, if it exists
@@ -63,9 +107,23 @@ public class MainActivity extends AppCompatActivity {
         }
         setWeatherDisplay(model.getCurrentWeatherReport());
 
+
         //Set up views
-        newWeatherBoxButton = findViewById(R.id.newWeatherBoxButton);
-        newWeatherBoxButton.setVisibility(View.INVISIBLE);
+        newWeatherBoxButton_1 = findViewById(R.id.newWeatherBoxButton1);
+        newWeatherBoxButton_2 = findViewById(R.id.newWeatherBoxButton2);
+        newWeatherBoxButton_3 = findViewById(R.id.newWeatherBoxButton3);
+
+        newWeatherBoxButton_1.setVisibility(View.INVISIBLE);
+        newWeatherBoxButton_2.setVisibility(View.INVISIBLE);
+        newWeatherBoxButton_3.setVisibility(View.INVISIBLE);
+
+        addButton_1 = findViewById(R.id.addButton);
+        addButton_1.setVisibility(View.INVISIBLE);
+        addButton_2 = findViewById(R.id.addButton2);
+        addButton_2.setVisibility(View.INVISIBLE);
+        addButton_3 = findViewById(R.id.addButton3);
+        addButton_3.setVisibility(View.INVISIBLE);
+
 
         weatherSearchBar = findViewById(R.id.currentLocationName_searchbar);
         enterWeatherButton = findViewById(R.id.enter_weather_button);
@@ -76,70 +134,70 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        update_weather_button = findViewById(R.id.update_weather_button);
-        update_weather_button.setOnClickListener(View -> {
-            String persistKey = sharedPref.getString("report1", null);
-            System.out.println(sharedPref.getString(persistKey, null));
-            System.out.println(model.getCurrentWeatherReport().getLocationName_city());
-            System.out.println(model.getRecentWeatherReport().getLocationName_city());
+        weatherBoxView1 = findViewById(R.id.weatherBoxView1);
+        weatherBoxView2 = findViewById(R.id.weatherBoxView2);
+        weatherBoxView3 = findViewById(R.id.weatherBoxView3);
 
-            String cache1 = model.getCurrentWeatherReport().getLocationName_city();
-            String cache1temp = model.getCurrentWeatherReport().getTemperature();
-            String cache2 = model.getRecentWeatherReport().getLocationName_city();
-            String cache3 = model.getRecentWeatherReport().getLocationName_city();
-            String cache4 = model.getRecentWeatherReport().getLocationName_city();
-            String pref_TAG = sharedPref.getString("report1", null);
-            String pref1 = sharedPref.getString(pref_TAG+"locationName_city", null);
-            String pref1temp = sharedPref.getString(pref_TAG+"temperature",null);
-            String pref_TAG2  = sharedPref.getString("report2", null);
-            String pref2 = sharedPref.getString(pref_TAG2+"locationName_city",null);
-            String pref_TAG3 = sharedPref.getString("report3", null);
-            String pref3 = sharedPref.getString(pref_TAG3+"locationName_city", null);
+        weatherBoxView1.setUpView(this);
+        weatherBoxView2.setUpView(this);
+        weatherBoxView3.setUpView(this);
 
-            String cacheAnalysis =
-                            "***CACHE ANALYSIS*** \n" +
-                            "First city is: "+cache1+"\n"+
-                            "First city temp is: "+cache1temp+"\n" +
-                            "Second city is: "+cache2+"\n"+
-                            "Third city is: "+cache3+"\n"+
-                            "Fourth city is: "+cache4+"\n"+
-                            "Prefs city is: "+pref1+"\n" +
-                            "Prefs city temp is: "+pref1temp+"\n"+
-                            "Prefs city 2 is: "+pref2+"\n"+
-                            "Prefs city 3 is: "+pref3;
+        //weatherBoxView1.alterViewLayout_standardView(this);
+        //weatherBoxView2.alterViewLayout_standardView(this);
+        //weatherBoxView3.alterViewLayout_standardView(this);
+        //weatherBoxView2.getWeatherViews_weatherIcon().setVisibility(View.INVISIBLE);
+
+        weatherBox1 = new WeatherBox(this, controller, model, weatherSearchBar, weatherBoxView1, newWeatherBoxButton_1, addButton_1);
+        weatherBox2 = new WeatherBox(this, controller, model, weatherSearchBar, weatherBoxView2, newWeatherBoxButton_2, addButton_2);
+        weatherBox3 = new WeatherBox(this, controller, model, weatherSearchBar, weatherBoxView3, newWeatherBoxButton_3, addButton_3);
 
 
-            System.out.println(cacheAnalysis);
+
+        weatherBoxView1.setLongClickable(true);
+        weatherBoxView1.setOnTouchListener(new View.OnTouchListener() {
+
+            private GestureDetectorCompat gestureDetector = new GestureDetectorCompat(getApplicationContext(), new WeatherBoxGestureListener(weatherBox1));
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                this.gestureDetector.onTouchEvent(event);
+                return false;
+            }
+
+        });
+
+        weatherBoxView2.setLongClickable(true);
+        weatherBoxView2.setOnTouchListener(new View.OnTouchListener() {
 
 
-            //Controller will automatically add weather report to the cache via viewmodel
-            //model will also backup the cache into the sharedpreferences persistence file
-            //controller.submitRequest("Dayton, OH", model);
-            //model.saveReportCache();
+            private GestureDetectorCompat gestureDetector = new GestureDetectorCompat(getApplicationContext(), new WeatherBoxGestureListener(weatherBox2));
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                this.gestureDetector.onTouchEvent(event);
+                return false;
+            }
 
 
         });
 
-        update_screen_button = findViewById(R.id.update_screen_button);
-        update_screen_button.setOnClickListener(View -> {
+        weatherBoxView3.setLongClickable(true);
+        weatherBoxView3.setOnTouchListener(new View.OnTouchListener() {
 
-            WeatherDisplayPresets weatherDisplayPresets = new WeatherDisplayPresets();
-            weatherDisplayPresets.exitAnimation(this);
+            private GestureDetectorCompat gestureDetector = new GestureDetectorCompat(getApplicationContext(), new WeatherBoxGestureListener(weatherBox3));
 
-
-                   /*
-
-            currentLocation_temperature.setText(model.getCurrentWeatherReport().getTemperature());
-            currentLocationName_cardView.setText(model.getCurrentWeatherReport().getLocationName_city());
-
-             */
-
-
-
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                this.gestureDetector.onTouchEvent(event);
+                return false;
+            }
         });
 
 
 
+        if (weatherBox1.getThisWeatherReport().getSkyCondition() == "rain") {
+            findViewById(R.id.parentLayout).setBackground(AppCompatResources.getDrawable(this, R.drawable.rain_background));
+        }
 
 
     }
@@ -147,20 +205,16 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void setWeatherDisplay(WeatherReport currentWeatherReport) {
-        currentLocation_temperature = findViewById(R.id.currentLocation_temperature);
-        currentLocationName_cardView = findViewById(R.id.currentLocationName_cardView);
+
         try {
+            weatherBox1.addNewWeather(currentWeatherReport.getTemperature(), currentWeatherReport.getLocationName_city());
 
-
-            currentLocation_temperature.setText(currentWeatherReport.getTemperature());
-            currentLocationName_cardView.setText(currentWeatherReport.getLocationName_city());
         } catch (Exception e) {
             System.out.println("There was an error setting the views.");
         }
 
-
-
     }
+
 
 
 

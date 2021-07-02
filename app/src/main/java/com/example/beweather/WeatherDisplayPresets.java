@@ -1,8 +1,13 @@
 package com.example.beweather;
 
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.gesture.Gesture;
+import android.gesture.GestureOverlayView;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -22,55 +27,100 @@ import javax.security.auth.callback.Callback;
 
 public class WeatherDisplayPresets  {
 
-    CardView cardView_1;
-    ObjectAnimator objectAnimator;
-    TextView currentLocation_temperature;
-    TextView currentLocationName_cardView;
-    ImageView weatherIcon;
-    RelativeLayout relativeLayoutInCardView;
-    ConstraintLayout parent;
-    Button newWeatherBoxButton;
-    public WeatherDisplayPresets() {
+    private CardView cardView;
+    private ObjectAnimator objectAnimator;
+    private Button newWeatherBoxButton;
+    private ImageView addButton;
+    public Context context;
+
+
+    GestureDetector gestureDetector;
+    public static final int SWIPE_THRESHOLD = 100;
+    public static final int SWIPE_VELOCITY_THRESHOLD = 100;
+
+    @SuppressLint("ClickableViewAccessibility")
+    public WeatherDisplayPresets(Context context, CardView cardView, Button newWeatherBoxButton, ImageView addButtonImageView) {
+
+        this.cardView = cardView;
+        this.newWeatherBoxButton = newWeatherBoxButton;
+        this.addButton = addButtonImageView;
+        this.context = context;
+
 
     }
 
-    public void exitAnimation(Activity activity) {
-        cardView_1 = activity.findViewById(R.id.cardView);
-        newWeatherBoxButton = activity.findViewById(R.id.newWeatherBoxButton);
 
-        objectAnimator = ObjectAnimator.ofFloat(cardView_1, "x", -600);
+
+    public void exitAnimation(
+
+    ) {
+
+
+        objectAnimator = ObjectAnimator.ofFloat(cardView, "x", -600);
         objectAnimator.setDuration(1500);
         objectAnimator.start();
 
         Animation fade = new AlphaAnimation(1.f, 0.f);
         fade.setDuration(1000);
-        cardView_1.startAnimation(fade);
-        cardView_1.postDelayed(new Runnable() {
+        cardView.startAnimation(fade);
+        cardView.postDelayed(new Runnable() {
             @Override
             public void run() {
-                cardView_1.setVisibility(android.view.View.INVISIBLE);
+                cardView.setVisibility(android.view.View.INVISIBLE);
             }
         }, 1000);
 
         Animation appear = new AlphaAnimation(0.f, 1.f);
         appear.setDuration(200);
-        cardView_1.postDelayed(new Runnable() {
+        cardView.postDelayed(new Runnable() {
 
             @Override
             public void run() {
                 newWeatherBoxButton.startAnimation(appear);
                 newWeatherBoxButton.setVisibility(View.VISIBLE);
+                addButton.setVisibility(View.VISIBLE);
+                addButton.startAnimation(appear);
 
             }
         }, 2000);
 
-
-
-
     }
 
+    public void newWeatherBox() {
+
+        //Animatino for new box appearing.
+        Animation appear = new AlphaAnimation(0.f, 1.f);
+        appear.setDuration(1500);
+        //Animation to remove newWeatherBoxButton
+        Animation fade = new AlphaAnimation(1.f, 0.f);
+        fade.setDuration(500);
+
+        newWeatherBoxButton.startAnimation(fade);
+        addButton.startAnimation(fade);
+        newWeatherBoxButton.postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                newWeatherBoxButton.setVisibility(View.INVISIBLE);
+                addButton.setVisibility(View.INVISIBLE);
+                cardView.setX(55);
+                cardView.startAnimation(appear);
+            }
+        }, 500);
 
 
+        newWeatherBoxButton.postDelayed(new Runnable() {
 
+            @Override
+            public void run() {
+
+                cardView.setVisibility(View.VISIBLE);
+            }
+        }, 750);
+
+
+        //Set up gesture detector
+
+    }
 
 }

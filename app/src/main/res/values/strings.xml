@@ -2,4 +2,7 @@
     <string name="app_name">BEWeather</string>
     <string name="currentLocation_hint">Choose a Location</string>
     <string name="no_city_chosen">Unknown City</string>
+    <string name="detailView_label_conditions">Conditions</string>
+    <string name="detailView_label_humidity">Humidity</string>
+    <string name="detailView_label_tonight">Tonight</string>
 </resources>

@@ -21,10 +21,25 @@ public class WebViewModel extends ViewModel {
 
 
     public WeatherReport getRecentWeatherReport() {
+
         return reportCache.getNextLocation();
     }
 
-    public WeatherReport getCurrentWeatherReport() {return reportCache.getCurrentLocation();}
+    public WeatherReport getCurrentWeatherReport() {
+        try { return reportCache.getCurrentLocation();
+
+        } catch (Exception e) {
+            System.out.println("ERROR GETTING CURRENT REPORT");
+
+            try {
+                reportCache.syncReportCacheWithSharedPreferences();
+            } catch (Exception e2) {
+                System.out.println("Error syncing report cache");
+            }
+            return null;
+        }
+
+    }
 
 
     @RequiresApi(api = Build.VERSION_CODES.N)

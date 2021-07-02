@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/detailView_parent"
+    android:layout_width="349dp"
+    android:layout_height="150dp">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="1dp"
+        tools:layout_editor_absoluteY="1dp">
+
+
+        <TextView
+            android:id="@+id/detailView_cityName"
+            android:layout_width="90dp"
+            android:layout_height="28dp"
+            android:layout_marginEnd="24dp"
+            android:text="unknown"
+            android:textAlignment="viewEnd"
+            android:textColor="@color/standard_text_color"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TableLayout
+            android:layout_width="209dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/detailView_cityName"
+            app:layout_constraintHorizontal_bias="0.238"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/detailView_label_conditions"
+                    android:layout_width="90dp"
+                    android:layout_height="30dp"
+                    android:layout_marginEnd="32dp"
+                    android:text="@string/detailView_label_conditions"
+                    android:textAlignment="viewEnd"
+                    android:textColor="@color/standard_text_color" />
+
+                <TextView
+                    android:id="@+id/detailView_conditions"
+                    android:layout_width="90dp"
+                    android:layout_height="28dp"
+                    android:layout_marginEnd="32dp"
+                    android:text="unknown"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/standard_text_color" />
+            </TableRow>
+
+
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/detailView_label_humidity"
+                    android:layout_width="90dp"
+                    android:layout_height="30dp"
+                    android:layout_marginEnd="32dp"
+                    android:text="@string/detailView_label_humidity"
+                    android:textAlignment="viewEnd"
+                    android:textColor="@color/standard_text_color" />
+
+                <TextView
+                    android:id="@+id/detailView_humidity"
+                    android:layout_width="90dp"
+                    android:layout_height="28dp"
+                    android:layout_marginEnd="32dp"
+                    android:text="unknown"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/standard_text_color" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/detailView_label_tonight"
+                    android:layout_width="90dp"
+                    android:layout_height="30dp"
+                    android:layout_marginEnd="32dp"
+                    android:text="@string/detailView_label_tonight"
+                    android:textAlignment="viewEnd"
+                    android:textColor="@color/standard_text_color" />
+
+                <TextView
+                    android:id="@+id/detailView_tonight"
+                    android:layout_width="90dp"
+                    android:layout_height="28dp"
+                    android:layout_marginEnd="32dp"
+                    android:text="unknown"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/standard_text_color" />
+            </TableRow>
+
+
+        </TableLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+

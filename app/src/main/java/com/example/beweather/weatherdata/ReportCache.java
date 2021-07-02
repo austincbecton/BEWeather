@@ -56,11 +56,15 @@ public class ReportCache {
 
     public WeatherReport getCurrentLocation() {
         WeatherReport nextLocation_report;
+        syncReportCacheWithSharedPreferences();
         try {
-            nextLocation_report = recentReports.get(nextLocation);
+            nextLocation_report = recentReports.get(0);
+
         } catch (Exception e) {
+            System.out.println("recentReports.get(0) produced an error.");
             return null;
         }
+
         return nextLocation_report;
     }
 
@@ -68,6 +72,8 @@ public class ReportCache {
 
     public WeatherReport getNextLocation() {
         WeatherReport nextLocation_report;
+
+        //Will rotate existing reports by adding first one to the end, and so forth.
         try {
             nextLocation_report = recentReports.get(0);
             recentReports.add(recentReports.get(0));
