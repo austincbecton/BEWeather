@@ -17,6 +17,7 @@ import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Outline;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -72,6 +73,8 @@ public class MainActivity extends AppCompatActivity {
     WeatherBox weatherBox3;
 
 
+    //WeatherIconView weatherIconView;
+
 
     private ExecutorService backgroundThread = Executors.newSingleThreadExecutor();
     public static String GLOBAL_SHARED_PREFERENCES = "global_shared_preferences";
@@ -86,6 +89,8 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
+
+
         //get utilities set up
         model = new WebViewModel(this);
         sharedPref = getSharedPreferences(MainActivity.GLOBAL_SHARED_PREFERENCES, Context.MODE_PRIVATE);
@@ -95,6 +100,9 @@ public class MainActivity extends AppCompatActivity {
         window.setStatusBarColor(ContextCompat.getColor(this,R.color.clear));
         WindowInsetsController windowControls = window.getInsetsController();
         windowControls.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_BARS_BY_TOUCH);
+
+
+
 
 
         //get the most recently searched-for weather, if it exists
@@ -193,13 +201,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-
-        if (weatherBox1.getThisWeatherReport().getSkyCondition() == "rain") {
-            findViewById(R.id.parentLayout).setBackground(AppCompatResources.getDrawable(this, R.drawable.rain_background));
-        }
-
-
     }
 
 
@@ -208,6 +209,8 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             weatherBox1.addNewWeather(currentWeatherReport.getTemperature(), currentWeatherReport.getLocationName_city());
+            model.getRecentWeatherReport();
+            weatherBox2.addNewWeather(model.getRecentWeatherReport().getTemperature(), model.getRecentWeatherReport().getLocationName_city());
 
         } catch (Exception e) {
             System.out.println("There was an error setting the views.");

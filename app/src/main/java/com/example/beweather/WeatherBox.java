@@ -11,6 +11,7 @@ import androidx.cardview.widget.CardView;
 import com.example.beweather.WeatherDisplayPresets;
 import com.example.beweather.model.WebViewModel;
 import com.example.beweather.weathercontroller.Controller;
+import com.example.beweather.weatherdata.WeatherIconProvider;
 import com.example.beweather.weatherdata.WeatherReport;
 
 public class WeatherBox {
@@ -46,7 +47,7 @@ public class WeatherBox {
             this.model = model;
             this.weatherSearchBar = weatherSearchBar;
             this.weatherBoxDetailsView = weatherBoxDetailsView;
-            this.weatherIcon = weatherBoxDetailsView.getWeatherViews_weatherIcon();
+            //this.weatherIcon = weatherBoxDetailsView.getWeatherViews_weatherIcon();
             this.newWeatherBoxButton = newWeatherBoxButton;
             this.currentLocation_temperature = weatherBoxDetailsView.getWeatherViews_temperature();
             this.currentLocation_name = weatherBoxDetailsView.getWeatherViews_location();
@@ -92,6 +93,10 @@ public class WeatherBox {
             if (temperature != null) {
                 currentLocation_temperature.setText(temperature);
                 currentLocation_name.setText(location);
+                WeatherIconProvider weatherIconProvider = new WeatherIconProvider();
+                int drawableId = weatherIconProvider.getWeatherIconId(thisWeatherBoxWeatherReport);
+                weatherBoxDetailsView.getWeatherIcon().setBackgroundResource(drawableId);
+
             } else {
 
                 try {
@@ -119,6 +124,8 @@ public class WeatherBox {
             weatherDisplayPresets.newWeatherBox();
         }
 
+
+
         public void displayWeatherDetails() {
             if (nowDisplayingDetails) {
                 weatherBoxDetailsView.removeAllViews();
@@ -127,19 +134,24 @@ public class WeatherBox {
                 //Set weather details
                 weatherBoxDetailsView.getWeatherViews_location().setText(getThisWeatherReport().getLocationName_city());
                 weatherBoxDetailsView.getWeatherViews_temperature().setText(getThisWeatherReport().getTemperature());
-                weatherBoxDetailsView.getWeatherViews_humidity().setText(getThisWeatherReport().getHumidity());
-                weatherBoxDetailsView.getWeatherViews_conditions().setText(getThisWeatherReport().getSkyCondition());
+                WeatherIconProvider weatherIconProvider = new WeatherIconProvider();
+                int drawableId = weatherIconProvider.getWeatherIconId(thisWeatherBoxWeatherReport);
+                weatherBoxDetailsView.getWeatherIcon().setBackgroundResource(drawableId);
 
             } else {
                 weatherBoxDetailsView.removeAllViews();
-                //weatherBoxDetailsView.setUpView(context);
                 weatherBoxDetailsView.alterViewLayout_detailView(context);
                 nowDisplayingDetails = true;
-                //Set weather details
-                weatherBoxDetailsView.getWeatherViews_cityName().setText(getThisWeatherReport().getLocationName_city());
-                weatherBoxDetailsView.getWeatherViews_conditions().setText(getThisWeatherReport().getSkyCondition());
-                weatherBoxDetailsView.getWeatherViews_humidity().setText(getThisWeatherReport().getHumidity());
-                weatherBoxDetailsView.getWeatherViews_tonight().setText(getThisWeatherReport().getTemperature());
+
+                try {
+                    weatherBoxDetailsView.getWeatherViews_cityName().setText(getThisWeatherReport().getLocationName_city());
+                    weatherBoxDetailsView.getWeatherViews_conditions().setText(getThisWeatherReport().getSkyCondition());
+                    weatherBoxDetailsView.getWeatherViews_humidity().setText(getThisWeatherReport().getHumidity());
+                    weatherBoxDetailsView.getWeatherViews_tonight().setText(getThisWeatherReport().getTemperature());
+                } catch (Exception e) {
+                    System.out.println("Error getting weather data");
+                }
+
 
             }
         }

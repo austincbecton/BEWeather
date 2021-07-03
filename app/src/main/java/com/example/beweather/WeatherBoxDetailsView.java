@@ -4,6 +4,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -16,6 +17,7 @@ import androidx.core.view.GestureDetectorCompat;
 public class WeatherBoxDetailsView extends CardView {
 
     OnTouchListener touchListener;
+    ImageView weatherIconView;
 
     public WeatherBoxDetailsView(@NonNull Context context) {
         super(context);
@@ -29,8 +31,13 @@ public class WeatherBoxDetailsView extends CardView {
         super(context, attrs, defStyleAttr);
     }
 
+
+
+
+
     public void setUpView(Context context) {
         inflate(context, R.layout.weather_standard_layout, this);
+
     }
 
     public void alterViewLayout_detailView(Context context) {
@@ -47,9 +54,13 @@ public class WeatherBoxDetailsView extends CardView {
 
     //STANDARD VIEW
 
+
+    /*
     public ImageView getWeatherViews_weatherIcon() {
         return findViewById(R.id.weatherIcon3);
     }
+    
+     */
 
     public TextView getWeatherViews_temperature() {
         return findViewById(R.id.currentLocation_temperature3);
@@ -76,6 +87,10 @@ public class WeatherBoxDetailsView extends CardView {
 
     public TextView getWeatherViews_cityName() {
         return findViewById(R.id.detailView_cityName);
+    }
+
+    public ImageView getWeatherIcon() {
+        return findViewById(R.id.weatherIcon3_image);
     }
 
 

@@ -32,11 +32,10 @@ public class WeatherDisplayPresets  {
     private Button newWeatherBoxButton;
     private ImageView addButton;
     public Context context;
-
-
     GestureDetector gestureDetector;
     public static final int SWIPE_THRESHOLD = 100;
     public static final int SWIPE_VELOCITY_THRESHOLD = 100;
+
 
     @SuppressLint("ClickableViewAccessibility")
     public WeatherDisplayPresets(Context context, CardView cardView, Button newWeatherBoxButton, ImageView addButtonImageView) {
