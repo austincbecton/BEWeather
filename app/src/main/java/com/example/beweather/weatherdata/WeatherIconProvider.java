@@ -15,7 +15,12 @@ public class WeatherIconProvider {
     }
 
     public int getWeatherIconId(WeatherReport weatherReport) {
-        iconType = weatherReport.getSkyCondition();
+        try {
+            iconType = weatherReport.getSkyCondition();
+        } catch(Exception e) {
+            iconType = "sun";
+        }
+
 
         if (iconType.equals("rain")) {
             return R.drawable.rain;

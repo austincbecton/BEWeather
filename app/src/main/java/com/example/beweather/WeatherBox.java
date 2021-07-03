@@ -65,7 +65,12 @@ public class WeatherBox {
                         defaultWeatherReport.getLocationName_city());
             }catch(Exception e) {
                 System.out.println("Error getting weather");
+                WeatherReport defaultWeatherReport = new WeatherReport(null, null);
+                defaultWeatherReport.updateWeatherReport(null, null, null, null, null, null, null, null);
+                setUp("??", "??");
             }
+
+
 
 
 
