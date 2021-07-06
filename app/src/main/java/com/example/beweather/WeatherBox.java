@@ -2,13 +2,14 @@ package com.example.beweather;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.example.beweather.model.WebViewModel;
 import com.example.beweather.weathercontroller.Controller;
-import com.example.beweather.weatherdata.WeatherIconProvider;
+import com.example.beweather.weatherdata.WeatherImageProvider;
 import com.example.beweather.weatherdata.WeatherReport;
 
 import java.util.Timer;
@@ -68,7 +69,6 @@ public class WeatherBox {
 
 
             this.newWeatherBoxButton.setOnClickListener(View ->{
-                System.out.println("NEW WEATHER PRESSED");
                 if (!weatherSearchBar.getText().toString().isEmpty()) {
                     controller.submitRequest(weatherSearchBar.getText().toString(), model);
                     this.thisWeatherBoxWeatherReport = model.getRecentReport();
@@ -95,75 +95,103 @@ public class WeatherBox {
 
 
     public void generateWeatherBox() {
+        String report_slot = "report"+thisWBoxId;
+        String report_TAG = sharedPref.getString(report_slot, null);
 
-
-            try {
-                String location = sharedPref.getString(TAG_location, null);
-                System.out.println("FROM SHARED PREF: " + location);
-                if (location != null) {controller.submitRequest(location, model);}
-                if (location == null) {
-                    thisWeatherBoxWeatherReport = model.getRecentReport();
-                    if (thisWeatherBoxWeatherReport.getLocationName_city() == null) {
-                        controller.submitRequest("Dayton, OH", model);
-                    } else {
-                        controller.submitRequest(
-                                thisWeatherBoxWeatherReport.getLocationName_city(), model);
-                    }
-                } else {
-                    thisWeatherBoxWeatherReport.matchWithSharedPreferences(context, thisWBoxId);
-                }
-                if (thisWeatherBoxWeatherReport.getLocationName_city() == null) {
-                    thisWeatherBoxWeatherReport = model.getRecentReport();
-                }
-                System.out.println("try block 1 part 1 complete.");
-                System.out.println(TAG_location + " is " + thisWeatherBoxWeatherReport.getLocationName_city());
-
+            if (sharedPref.getString(report_TAG +"locationName_city", null) != null) {
                 try {
-                    System.out.println(this.thisWeatherBoxWeatherReport.getLocationName_city());
-                    System.out.println("try block 1 part 2 complete.");
-                    System.out.println(TAG_location + " is " + thisWeatherBoxWeatherReport.getLocationName_city());
+
+                    WeatherReport grabbedReport = new WeatherReport("", "");
+                    grabbedReport.matchWithSharedPreferences(context, thisWBoxId);
+
+                    thisWeatherBoxWeatherReport = grabbedReport;
+
+                    try {
+
+                        if (thisWeatherBoxWeatherReport.getLocationName_city().equals("") ||
+                                thisWeatherBoxWeatherReport.getLocationName_city() == null) {
+                            thisWeatherBoxWeatherReport = model.getRecentReport();
+                            thisWeatherBoxWeatherReport.saveToSharedPreferences(context, thisWBoxId);
+                        }} catch (Exception e2) {
+                        controller.submitRequest("Dayton, OH", model);
+                    }
+
+                    System.out.println("****CITY NAME IS: "+ thisWeatherBoxWeatherReport.getLocationName_city());
+
+
+                    weatherBoxDetailsView.setUpView(context);
+                    weatherBoxDetailsView.removeAllViews();
+                    weatherBoxDetailsView.alterViewLayout_standardView(context);
+                    weatherBoxDetailsView.getWeatherViews_location().setText(this.thisWeatherBoxWeatherReport.getLocationName_city());
+                    weatherBoxDetailsView.getWeatherViews_temperature().setText(this.thisWeatherBoxWeatherReport.getTemperature());
+
+
+                    try {
+                        WeatherImageProvider weatherImageProvider = new WeatherImageProvider();
+                        Integer drawableId = weatherImageProvider.getWeatherIconId(thisWeatherBoxWeatherReport);
+                        Integer backgroundId = weatherImageProvider.getWeatherBackgroundId(thisWeatherBoxWeatherReport);
+                        weatherBoxDetailsView.getWeatherIcon().setBackgroundResource(drawableId);
+                        weatherBoxDetailsView.getStandardViewLayoutBackground().setBackgroundResource(backgroundId);
+                    } catch(Exception e) {
+                        System.out.println("Error getting pictures");
+                    }
 
 
 
                 } catch (Exception e) {
-                    WeatherReport dummy = new WeatherReport("??", "??");
-                    dummy.updateWeatherReport("??", "??", "??", "??", "??", "??", "??", "??");
-                    this.thisWeatherBoxWeatherReport = dummy;
+                    System.out.println("ERROR... LINE 121");
+                    //For first-time setup, we'll automatically go into add view
+                    WeatherReport dummy = new WeatherReport("", "");
+                    weatherBoxDetailsView.setUpView(context);
+                    weatherBoxDetailsView.removeAllViews();
+                    weatherBoxDetailsView.alterViewLayout_standardView(context);
+                    weatherBoxDetailsView.getWeatherViews_location().setText(dummy.getLocationName_city());
+                    weatherBoxDetailsView.getWeatherViews_temperature().setText(dummy.getTemperature());
+                    WeatherImageProvider weatherImageProvider = new WeatherImageProvider();
+                    //int drawableId = weatherImageProvider.getWeatherIconId(dummy);
+                    weatherBoxDetailsView.getWeatherIcon().setBackgroundResource(R.drawable.sun);
+                    weatherBoxDetailsView.setVisibility(View.INVISIBLE);
+                    exitWeatherBoxInvisible();
                 }
 
+            } else if (this.thisWBoxId.equals("wBox1")) {
+                thisWeatherBoxWeatherReport = model.getRecentReport();
+                thisWeatherBoxWeatherReport.saveToSharedPreferences(context, thisWBoxId);
+                if (thisWeatherBoxWeatherReport.getLocationName_city() == null || thisWeatherBoxWeatherReport.equals("")) {
+                    thisWeatherBoxWeatherReport = new WeatherReport("Sample", "");
+                    thisWeatherBoxWeatherReport.updateWeatherReport("", "70",
+                            "rain", "60", "", "", "",
+                            "");
+                }
                 weatherBoxDetailsView.setUpView(context);
                 weatherBoxDetailsView.removeAllViews();
                 weatherBoxDetailsView.alterViewLayout_standardView(context);
                 weatherBoxDetailsView.getWeatherViews_location().setText(this.thisWeatherBoxWeatherReport.getLocationName_city());
                 weatherBoxDetailsView.getWeatherViews_temperature().setText(this.thisWeatherBoxWeatherReport.getTemperature());
-                System.out.println("weatherboxdetailsview complete.");
-
-                WeatherIconProvider weatherIconProvider = new WeatherIconProvider();
-                int drawableId = weatherIconProvider.getWeatherIconId(thisWeatherBoxWeatherReport);
-                weatherBoxDetailsView.getWeatherIcon().setBackgroundResource(drawableId);
-
-                System.out.println("icon provider complete.");
-
-                thisWeatherBoxWeatherReport.saveToSharedPreferences(context, thisWBoxId);
-                System.out.println("try block 1 part 3 complete.");
-                System.out.println(TAG_location + " is " + thisWeatherBoxWeatherReport.getLocationName_city());
 
 
+                    try {
+                        WeatherImageProvider weatherImageProvider = new WeatherImageProvider();
+                        Integer drawableId = weatherImageProvider.getWeatherIconId(thisWeatherBoxWeatherReport);
+                        Integer backgroundId = weatherImageProvider.getWeatherBackgroundId(thisWeatherBoxWeatherReport);
+                        weatherBoxDetailsView.getWeatherIcon().setBackgroundResource(drawableId);
+                        weatherBoxDetailsView.getStandardViewLayoutBackground().setBackgroundResource(backgroundId);
+                    } catch(Exception e) {
+                        System.out.println("Error getting pictures");
+                    }
 
-            } catch (Exception e) {
-                //For first-time setup, we'll automatically go into add view
-                WeatherReport dummy = new WeatherReport("", "");
-                weatherBoxDetailsView.setUpView(context);
-                weatherBoxDetailsView.removeAllViews();
-                weatherBoxDetailsView.alterViewLayout_standardView(context);
-                weatherBoxDetailsView.getWeatherViews_location().setText(dummy.getLocationName_city());
-                weatherBoxDetailsView.getWeatherViews_temperature().setText(dummy.getTemperature());
-                WeatherIconProvider weatherIconProvider = new WeatherIconProvider();
-                //int drawableId = weatherIconProvider.getWeatherIconId(dummy);
-                weatherBoxDetailsView.getWeatherIcon().setBackgroundResource(R.drawable.sun);
-                exitWeatherBox();
+
+            } else if (model.getRecentReport().getLocationName_city() != null){
+                WeatherReport newReport = model.getRecentReport();
+                newReport.saveToSharedPreferences(context, thisWBoxId);
+                generateWeatherBox();
             }
 
+
+            else {
+                System.out.println("NO SHARED PREF, SO NO VIEWS DISPLAYED");
+                exitWeatherBoxInvisible();
+            }
 
 
 
@@ -198,9 +226,11 @@ public class WeatherBox {
             try {
                 weatherBoxDetailsView.getWeatherViews_location().setText(this.thisWeatherBoxWeatherReport.getLocationName_city());
                 weatherBoxDetailsView.getWeatherViews_temperature().setText(this.thisWeatherBoxWeatherReport.getTemperature());
-                WeatherIconProvider weatherIconProvider = new WeatherIconProvider();
-                int drawableId = weatherIconProvider.getWeatherIconId(thisWeatherBoxWeatherReport);
-                weatherBoxDetailsView.getWeatherIcon().setBackgroundResource(drawableId);}
+                WeatherImageProvider weatherImageProvider = new WeatherImageProvider();
+                int drawableId = weatherImageProvider.getWeatherIconId(thisWeatherBoxWeatherReport);
+                int backgroundId = weatherImageProvider.getWeatherBackgroundId(thisWeatherBoxWeatherReport);
+                weatherBoxDetailsView.getWeatherIcon().setBackgroundResource(drawableId);
+                weatherBoxDetailsView.getStandardViewLayoutBackground().setBackgroundResource(backgroundId);}
             catch(Exception e) {
                 weatherBoxDetailsView.getWeatherViews_location().setText("??");
                 weatherBoxDetailsView.getWeatherViews_temperature().setText("??");
@@ -217,17 +247,25 @@ public class WeatherBox {
                 weatherBoxDetailsView.getWeatherViews_humidity().setText(this.thisWeatherBoxWeatherReport.getHumidity());
                 weatherBoxDetailsView.getWeatherViews_tonight().setText(this.thisWeatherBoxWeatherReport.getTemperature());
             } catch (Exception e) {
-                System.out.println("Error getting weather data");
+                System.out.println("Error line 224");
             }
         }
 
     }
     public void exitWeatherBox() {
-        weatherDisplayPresets.exitAnimation();
-        System.out.println("REMOVING SHARED PREF");
+
+            weatherDisplayPresets.exitAnimation();
+        String report_slot = "report"+thisWBoxId;
+        String report_TAG = sharedPref.getString(report_slot, null);
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.remove(TAG_location);
+        editor.remove(report_TAG+"locationName_city");
         editor.commit();
+
+    }
+
+    public void exitWeatherBoxInvisible() {
+        weatherBoxDetailsView.removeAllViews();
+        weatherDisplayPresets.exitAnimationOnlyAddButton();
 
     }
 

@@ -73,6 +73,28 @@ public class WeatherDisplayPresets  {
 
     }
 
+    public void exitAnimationOnlyAddButton(
+
+    ) {
+
+        Animation appear = new AlphaAnimation(0.f, 1.f);
+        appear.setDuration(100);
+        cardView.postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                newWeatherBoxButton.startAnimation(appear);
+                newWeatherBoxButton.setVisibility(View.VISIBLE);
+                addButton.setVisibility(View.VISIBLE);
+                addButton.startAnimation(appear);
+
+            }
+        }, 1000);
+
+    }
+
+
+
     public void newWeatherBox() {
 
         //Animatino for new box appearing.

@@ -90,16 +90,16 @@ public class WeatherReport {
     }
 
     //report_save_number will help us identify this recent save
-    public void saveToSharedPreferences(Context context, String report_save_number) {
+    public void saveToSharedPreferences(Context context, String wBoxId) {
         //First, access shared preferences.
         SharedPreferences sharedPref = context.getSharedPreferences(GLOBAL_SHARED_PREFERENCES, Context.MODE_PRIVATE);
 
 
         // There are a limited number of slots in the cache, which we're saving as "report_id."
         // So we can later identify the city in this particular slot, to get the other information.
-        String report_slot = "report"+report_save_number;
+        String report_slot = "report"+wBoxId;
 
-
+        /*
         //Now, lets clear any currently existing saved report under this save_number to prevent memory leaks.
         if (sharedPref.getString(report_slot, null) != null) {
             SharedPreferences.Editor editor = sharedPref.edit();
@@ -119,6 +119,8 @@ public class WeatherReport {
             editor.apply();
         }
 
+         */
+
 
         //Now, save this current city. We'll create special tags to later retrieve the info we save.
         SharedPreferences.Editor editor = sharedPref.edit();
@@ -126,7 +128,7 @@ public class WeatherReport {
 
         // report_TAG will tell us the location and help us gather other details.
         // We will later retrieve this using "report_id" above.
-        String report_TAG = report_save_number + getLocationName_city() + getLocationName_country();
+        String report_TAG = wBoxId + getLocationName_city() + getLocationName_country();
 
         editor.putString(report_slot, report_TAG);
 
@@ -144,14 +146,14 @@ public class WeatherReport {
 
         //We can use this locationName_city, report_TAG addition later for finding this report
         //in a weatherbox.
-        editor.putString(locationName_city, report_save_number);
+        editor.putString(locationName_city, wBoxId);
         editor.apply();
 
     }
 
-    public void matchWithSharedPreferences(Context context, String report_save_number) {
+    public void matchWithSharedPreferences(Context context, String wBoxId) {
         SharedPreferences sharedPref = context.getSharedPreferences(GLOBAL_SHARED_PREFERENCES, Context.MODE_PRIVATE);
-        String report_slot = "report"+report_save_number;
+        String report_slot = "report"+wBoxId;
         String report_TAG = sharedPref.getString(report_slot, null);
         String city = sharedPref.getString(report_TAG +"locationName_city", null);
         String country = sharedPref.getString(report_TAG +"locationName_country", null);

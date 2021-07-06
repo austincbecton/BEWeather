@@ -39,12 +39,13 @@ public class WeatherBoxDetailsView extends CardView {
 
     public void setUpView(Context context) {
         inflate(context, R.layout.weather_standard_layout, this);
+        setPreventCornerOverlap(true);
+        setRadius(50);
+        setElevation(10);
 
     }
 
     public void alterViewLayout_detailView(Context context) {
-
-
         inflate(context, R.layout.weather_details_layout, this);
     }
 
@@ -100,6 +101,10 @@ public class WeatherBoxDetailsView extends CardView {
         removeAllViews();
         inflate(context, R.layout.weather_loading_layout, this);
 
+    }
+
+    public RelativeLayout getStandardViewLayoutBackground() {
+        return findViewById(R.id.cardViewBackgroundLocation);
     }
 
 

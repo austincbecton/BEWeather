@@ -97,9 +97,12 @@ public class MainActivity extends AppCompatActivity {
         controller = Controller.getController(this);
         //model.syncReportCache();
         Window window = this.getWindow();
-        window.setStatusBarColor(ContextCompat.getColor(this,R.color.clear));
+        window.setStatusBarColor(ContextCompat.getColor(this,R.color.standard_text_color));
+        /*
         WindowInsetsController windowControls = window.getInsetsController();
         windowControls.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_BARS_BY_TOUCH);
+
+         */
 
 
 
@@ -155,9 +158,9 @@ public class MainActivity extends AppCompatActivity {
         //weatherBoxView3.setUpView(this);
 
         //Each weatherbox needs an ID, which will help it access its unique shared preferences file
-        String wBoxId_1 = "1";
-        String wBoxId_2 = "2";
-        String wBoxId_3 = "3";
+        String wBoxId_1 = "wBox1";
+        String wBoxId_2 = "wBox2";
+        String wBoxId_3 = "wBox3";
 
         //Pass to views to WeatherBox
         weatherBox1 = new WeatherBox(this, controller, model, weatherSearchBar, weatherBoxView1, newWeatherBoxButton_1, addButton_1, wBoxId_1);

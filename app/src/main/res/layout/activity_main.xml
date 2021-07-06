@@ -3,29 +3,28 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:fitsSystemWindows="true"
     android:id="@+id/parentLayout"
-    android:background="@drawable/default_background"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/standard_text_color"
+    android:fitsSystemWindows="true"
     tools:context=".MainActivity">
-
 
 
     <EditText
         android:id="@+id/currentLocationName_searchbar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="664dp"
+        android:layout_width="313dp"
+        android:layout_height="46dp"
+        android:layout_marginTop="572dp"
         android:ems="10"
         android:hint="@string/currentLocation_hint"
         android:inputType="textPersonName"
-        android:textColor="@color/standard_text_color"
+        android:textColor="@color/white"
+        android:textColorHint="#FFFFFF"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.524"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
 
     <com.example.beweather.WeatherBoxDetailsView
         android:id="@+id/weatherBoxView1"
@@ -38,8 +37,7 @@
         app:cardBackgroundColor="#2400FFD4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-    </com.example.beweather.WeatherBoxDetailsView>
+        app:layout_constraintTop_toTopOf="parent"/>
 
 
     <Button
@@ -108,6 +106,7 @@
 
 
     </com.example.beweather.WeatherBoxDetailsView>
+
     <Button
         android:id="@+id/newWeatherBoxButton3"
         android:layout_width="306dp"
@@ -129,8 +128,8 @@
         android:id="@+id/addButton"
         android:layout_width="88dp"
         android:layout_height="78dp"
-        android:background="#3BFFFFFF"
-        android:backgroundTint="#33FFFFFF"
+        android:background="#00000000"
+        android:backgroundTint="#00000000"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="@+id/newWeatherBoxButton1"
         app:layout_constraintEnd_toEndOf="@+id/newWeatherBoxButton1"
@@ -143,8 +142,8 @@
         android:id="@+id/addButton2"
         android:layout_width="88dp"
         android:layout_height="78dp"
-        android:background="#3BFFFFFF"
-        android:backgroundTint="#33FFFFFF"
+        android:background="#00000000"
+        android:backgroundTint="#00000000"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="@+id/newWeatherBoxButton2"
         app:layout_constraintEnd_toEndOf="@+id/newWeatherBoxButton2"
@@ -157,8 +156,8 @@
         android:id="@+id/addButton3"
         android:layout_width="88dp"
         android:layout_height="78dp"
-        android:background="#3BFFFFFF"
-        android:backgroundTint="#33FFFFFF"
+        android:background="#00000000"
+        android:backgroundTint="#00000000"
         android:scaleType="fitCenter"
         android:textColor="@color/standard_text_color"
         app:layout_constraintBottom_toBottomOf="@+id/weatherBoxView3"
@@ -173,15 +172,24 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="#00FFFFFF"
-        android:textColor="@color/standard_text_color"
         android:text="ok"
+        android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="@+id/currentLocationName_searchbar"
         app:layout_constraintEnd_toEndOf="@+id/currentLocationName_searchbar"
         app:layout_constraintTop_toTopOf="@+id/currentLocationName_searchbar"
         app:layout_constraintVertical_bias="1.0" />
 
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        app:itemIconTint="@color/standard_text_color"
+        app:itemRippleColor="#00BCD4"
+        app:itemTextColor="@color/standard_text_color"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:menu="@menu/bottom_menu"
+        tools:layout_editor_absoluteX="1dp">
 
-
+    </com.google.android.material.bottomnavigation.BottomNavigationView>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

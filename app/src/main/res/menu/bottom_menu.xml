@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_option_weather"
+        android:title="weather"
+        android:icon="@drawable/storm"/>
+    <item android:id="@+id/menu_option_account"
+        android:title="account"
+        android:icon="@drawable/ic_launcher_foreground"/>
+</menu>
