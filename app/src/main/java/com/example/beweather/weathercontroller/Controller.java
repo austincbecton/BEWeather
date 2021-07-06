@@ -200,7 +200,7 @@ public class Controller  {
                         System.out.println(temperature);
                         System.out.println(skyCondition);
                         System.out.println(newReport.getHumidity());
-                        vmodel.addWeatherReport(newReport);
+                        vmodel.addWeatherReport(newReport, context);
 
                     }
                 }, error -> System.out.println("ERROR GETTING WEATHER"));
@@ -234,130 +234,134 @@ public class Controller  {
 
     private String condition_parcer(String reportedConditions) {
         String parcedCondition = "";
+        System.out.println("REPORTED CONDITION ARE: " + reportedConditions);
         switch (reportedConditions) {
-            case  "Blowing Or Drifting Snow":
+            case  "blowing or drifting snow":
                 parcedCondition = "snow";
                 break;
-            case "Drizzle":
+            case "drizzle":
                 parcedCondition = "rain";
                 break;
-            case "Heavy Drizzle":
+            case "heavy drizzle":
                 parcedCondition = "rain";
                 break;
-            case "Light Drizzle":
+            case "light drizzle":
                 parcedCondition = "rain";
                 break;
-            case "Heavy Drizzle/Rain":
+            case "heavy drizzle/rain":
                 parcedCondition = "rain";
                 break;
-            case "Light Drizzle/Rain":
+            case "light drizzle/rain":
                 parcedCondition = "rain";
                 break;
-            case "Freezing Drizzle/Freezing Rain":
+            case "freezing drizzle/freezing rain":
                 parcedCondition = "snow";
                 break;
-            case "Heavy Freezing Drizzle/Freezing Rain":
+            case "heavy freezing drizzle/freezing rain":
                 parcedCondition = "snow";
                 break;
-            case "Light Freezing Drizzle/Freezing Rain":
+            case "light freezing drizzle/freezing rain":
                 parcedCondition = "snow";
                 break;
-            case "Freezing Fog":
+            case "freezing fog":
                 parcedCondition = "snow";
                 break;
-            case "Heavy Freezing Rain":
+            case "heavy freezing rain":
                 parcedCondition = "snow";
                 break;
-            case "Light Freezing Rain":
+            case "light freezing rain":
                 parcedCondition = "snow";
                 break;
-            case "Funnel Cloud/Tornado":
+            case "funnel cloud/tornado":
                 parcedCondition = "storm";
                 break;
-            case "Hail Showers":
+            case "hail showers":
                 parcedCondition = "storm";
                 break;
-            case "Ice":
+            case "ice":
                 parcedCondition = "snow";
                 break;
-            case "Lightning Without Thunder":
+            case "lightning without thunder":
                 parcedCondition = "rain";
                 break;
-            case "Mist":
+            case "mist":
                 parcedCondition = "rain";
                 break;
-            case "Precipitation In Vicinity":
+            case "precipitation in vicinity":
                 parcedCondition = "rain";
                 break;
-            case "Rain":
+            case "rain":
                 parcedCondition = "rain";
                 break;
-            case "Heavy Rain And Snow":
+            case "heavy rain and snow":
                 parcedCondition = "snow";
                 break;
-            case "Light Rain And Snow":
+            case "light rain and snow":
                 parcedCondition = "snow";
                 break;
-            case "Rain Showers":
+            case "rain showers":
                 parcedCondition = "rain";
                 break;
-            case "Heavy Rain":
+            case "heavy rain":
                 parcedCondition = "storm";
                 break;
-            case "Light Rain":
+            case "light rain":
                 parcedCondition = "rain";
                 break;
-            case "Sky Coverage Decreasing":
-                parcedCondition = "partlycloudy";
-                break;
-            case "Sky Unchanged":
-                parcedCondition = "sun";
-                break;
-            case "Smoke Or Haze":
-                parcedCondition = "sun";
-                break;
-            case "Snow":
-                parcedCondition = "snow";
-                break;
-            case "Snow And Rain Showers":
-                parcedCondition = "snow";
-                break;
-            case "Snow Showers":
-                parcedCondition = "snow";
-                break;
-            case "Heavy Snow":
-                parcedCondition = "snow";
-                break;
-            case "Light Snow":
-                parcedCondition = "snow";
-                break;
-            case "Squalls":
-                parcedCondition = "rain";
-                break;
-            case "Thunderstorm":
-                parcedCondition = "storm";
-                break;
-            case "Thunderstorm Without Precipitation":
-                parcedCondition = "storm";
-                break;
-            case "Diamond Dust":
-                parcedCondition = "sun";
-                break;
-            case "Hail":
-                parcedCondition = "storm";
-                break;
-            case "Overcast":
+            case "sky coverage decreasing":
                 parcedCondition = "cloudy";
                 break;
-            case "Partially cloudy":
-                System.out.println("partlycloudy");
-                break;
-            case "Clear":
+            case "sky unchanged":
                 parcedCondition = "sun";
                 break;
-
+            case "smoke or haze":
+                parcedCondition = "sun";
+                break;
+            case "snow":
+                parcedCondition = "snow";
+                break;
+            case "snow and rain showers":
+                parcedCondition = "snow";
+                break;
+            case "snow showers":
+                parcedCondition = "snow";
+                break;
+            case "heavy snow":
+                parcedCondition = "snow";
+                break;
+            case "light snow":
+                parcedCondition = "snow";
+                break;
+            case "squalls":
+                parcedCondition = "rain";
+                break;
+            case "thunderstorm":
+                parcedCondition = "storm";
+                break;
+            case "thunderstorm without precipitation":
+                parcedCondition = "storm";
+                break;
+            case "diamond dust":
+                parcedCondition = "sun";
+                break;
+            case "hail":
+                parcedCondition = "storm";
+                break;
+            case "overcast":
+                parcedCondition = "cloudy";
+                break;
+            case "partially cloudy":
+                parcedCondition = "cloudy";
+                break;
+            case "clear":
+                parcedCondition = "sun";
+                break;
+            case "cloudy":
+                parcedCondition = "cloudy";
+            case "partly-cloudy-day":
+                parcedCondition = "cloudy";
         }
-
+        System.out.println("PARCED CONDITION IS: " + parcedCondition);
         return parcedCondition;
     }
 

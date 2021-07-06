@@ -20,16 +20,13 @@ public class ReportCache {
     private int nextLocation;
     public SharedPreferences sharedPref;
     public Context context;
-
     public ExecutorService backgroundThread = Executors.newSingleThreadExecutor();
 
     private ReportCache(Context context) {
         this.context = context;
         recentReports = new ArrayList<>();
         nextLocation = 0;
-
         sharedPref = context.getSharedPreferences(MainActivity.GLOBAL_SHARED_PREFERENCES, Context.MODE_PRIVATE);
-
     }
 
     public static ReportCache getReportCache(Context context){
@@ -52,7 +49,6 @@ public class ReportCache {
     public void clearCache() {
         recentReports.clear();
     }
-
 
     public WeatherReport getCurrentLocation() {
         WeatherReport nextLocation_report;

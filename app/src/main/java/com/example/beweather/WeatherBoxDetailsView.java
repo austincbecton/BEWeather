@@ -13,6 +13,8 @@ import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.view.GestureDetectorCompat;
 
+import com.example.beweather.weatherdata.WeatherReport;
+
 
 public class WeatherBoxDetailsView extends CardView {
 
@@ -92,6 +94,15 @@ public class WeatherBoxDetailsView extends CardView {
     public ImageView getWeatherIcon() {
         return findViewById(R.id.weatherIcon3_image);
     }
+
+
+    public void startLoadingScreen(Context context) {
+        removeAllViews();
+        inflate(context, R.layout.weather_loading_layout, this);
+
+    }
+
+
 
 
 }

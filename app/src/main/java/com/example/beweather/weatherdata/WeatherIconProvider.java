@@ -18,8 +18,10 @@ public class WeatherIconProvider {
         try {
             iconType = weatherReport.getSkyCondition();
         } catch(Exception e) {
+            System.out.println("Error getting Icon type.");
             iconType = "sun";
         }
+        System.out.println("ICON TYPE IS: " + iconType);
 
 
         if (iconType.equals("rain")) {
@@ -37,6 +39,8 @@ public class WeatherIconProvider {
         } else if (iconType.equals("storm") || iconType.equals("stormy") || iconType.equals("storms")) {
             return R.drawable.storm;
         } else {return R.drawable.sun;}
+
+
     }
 
 

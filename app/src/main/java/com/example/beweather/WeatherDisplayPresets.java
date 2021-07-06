@@ -2,28 +2,16 @@ package com.example.beweather;
 
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
-import android.gesture.Gesture;
-import android.gesture.GestureOverlayView;
 import android.view.GestureDetector;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.ConstraintSet;
 
-import com.example.beweather.R;
 
-import javax.security.auth.callback.Callback;
 
 public class WeatherDisplayPresets  {
 
@@ -56,7 +44,7 @@ public class WeatherDisplayPresets  {
 
 
         objectAnimator = ObjectAnimator.ofFloat(cardView, "x", -600);
-        objectAnimator.setDuration(1500);
+        objectAnimator.setDuration(1000);
         objectAnimator.start();
 
         Animation fade = new AlphaAnimation(1.f, 0.f);
@@ -70,7 +58,7 @@ public class WeatherDisplayPresets  {
         }, 1000);
 
         Animation appear = new AlphaAnimation(0.f, 1.f);
-        appear.setDuration(200);
+        appear.setDuration(100);
         cardView.postDelayed(new Runnable() {
 
             @Override
@@ -81,7 +69,7 @@ public class WeatherDisplayPresets  {
                 addButton.startAnimation(appear);
 
             }
-        }, 2000);
+        }, 1000);
 
     }
 

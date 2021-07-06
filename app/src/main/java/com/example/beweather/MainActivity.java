@@ -18,8 +18,10 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Outline;
+import android.inputmethodservice.InputMethodService;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -31,6 +33,7 @@ import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -53,8 +56,6 @@ public class MainActivity extends AppCompatActivity {
     EditText weatherSearchBar;
     Button enterWeatherButton;
 
-
-
     Button newWeatherBoxButton_1;
     Button newWeatherBoxButton_2;
     Button newWeatherBoxButton_3;
@@ -67,11 +68,9 @@ public class MainActivity extends AppCompatActivity {
     WeatherBoxDetailsView weatherBoxView2;
     WeatherBoxDetailsView weatherBoxView3;
 
-
     WeatherBox weatherBox1;
     WeatherBox weatherBox2;
     WeatherBox weatherBox3;
-
 
     //WeatherIconView weatherIconView;
 
@@ -90,12 +89,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-
         //get utilities set up
         model = new WebViewModel(this);
-        sharedPref = getSharedPreferences(MainActivity.GLOBAL_SHARED_PREFERENCES, Context.MODE_PRIVATE);
+        sharedPref = getSharedPreferences(GLOBAL_SHARED_PREFERENCES, Context.MODE_PRIVATE);
+
+
         controller = Controller.getController(this);
-        model.syncReportCache();
+        //model.syncReportCache();
         Window window = this.getWindow();
         window.setStatusBarColor(ContextCompat.getColor(this,R.color.clear));
         WindowInsetsController windowControls = window.getInsetsController();
@@ -103,8 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
-
+/*
         //get the most recently searched-for weather, if it exists
         if (model.getCurrentWeatherReport() != null) {
             //Nothing, just set the weather display items
@@ -113,7 +112,9 @@ public class MainActivity extends AppCompatActivity {
         } else {
             controller.submitRequest("Dayton, OH", model);
         }
-        setWeatherDisplay(model.getCurrentWeatherReport());
+
+ */
+
 
 
         //Set up views
@@ -138,28 +139,30 @@ public class MainActivity extends AppCompatActivity {
         enterWeatherButton.setOnClickListener(View -> {
             String location = weatherSearchBar.getText().toString();
             controller.submitRequest(location, model);
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(View.getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
+
         });
 
 
-
+        //The views/layouts that we'll pass to WeatherBox objects.
         weatherBoxView1 = findViewById(R.id.weatherBoxView1);
         weatherBoxView2 = findViewById(R.id.weatherBoxView2);
         weatherBoxView3 = findViewById(R.id.weatherBoxView3);
 
-        weatherBoxView1.setUpView(this);
-        weatherBoxView2.setUpView(this);
-        weatherBoxView3.setUpView(this);
+        //weatherBoxView1.setUpView(this);
+        //weatherBoxView2.setUpView(this);
+        //weatherBoxView3.setUpView(this);
 
-        //weatherBoxView1.alterViewLayout_standardView(this);
-        //weatherBoxView2.alterViewLayout_standardView(this);
-        //weatherBoxView3.alterViewLayout_standardView(this);
-        //weatherBoxView2.getWeatherViews_weatherIcon().setVisibility(View.INVISIBLE);
+        //Each weatherbox needs an ID, which will help it access its unique shared preferences file
+        String wBoxId_1 = "1";
+        String wBoxId_2 = "2";
+        String wBoxId_3 = "3";
 
-        weatherBox1 = new WeatherBox(this, controller, model, weatherSearchBar, weatherBoxView1, newWeatherBoxButton_1, addButton_1);
-        weatherBox2 = new WeatherBox(this, controller, model, weatherSearchBar, weatherBoxView2, newWeatherBoxButton_2, addButton_2);
-        weatherBox3 = new WeatherBox(this, controller, model, weatherSearchBar, weatherBoxView3, newWeatherBoxButton_3, addButton_3);
-
-
+        //Pass to views to WeatherBox
+        weatherBox1 = new WeatherBox(this, controller, model, weatherSearchBar, weatherBoxView1, newWeatherBoxButton_1, addButton_1, wBoxId_1);
+        weatherBox2 = new WeatherBox(this, controller, model, weatherSearchBar, weatherBoxView2, newWeatherBoxButton_2, addButton_2, wBoxId_2);
+        weatherBox3 = new WeatherBox(this, controller, model, weatherSearchBar, weatherBoxView3, newWeatherBoxButton_3, addButton_3, wBoxId_3);
 
         weatherBoxView1.setLongClickable(true);
         weatherBoxView1.setOnTouchListener(new View.OnTouchListener() {
@@ -205,17 +208,16 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    public void setWeatherDisplay(WeatherReport currentWeatherReport) {
 
-        try {
-            weatherBox1.addNewWeather(currentWeatherReport.getTemperature(), currentWeatherReport.getLocationName_city());
-            model.getRecentWeatherReport();
-            weatherBox2.addNewWeather(model.getRecentWeatherReport().getTemperature(), model.getRecentWeatherReport().getLocationName_city());
 
-        } catch (Exception e) {
-            System.out.println("There was an error setting the views.");
+
+    public void showSoftKeyboard(View view) {
+        if (view.requestFocus()) {
+            InputMethodManager imm = (InputMethodManager)
+                    getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+
         }
-
     }
 
 

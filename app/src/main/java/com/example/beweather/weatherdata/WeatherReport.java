@@ -19,6 +19,8 @@ public class WeatherReport {
     private String minTemp;
     private String tomorrow;
     private String tonight;
+    private String thisReport_TAGInSavedPref;
+    public static String GLOBAL_SHARED_PREFERENCES = "global_shared_preferences";
 
     public WeatherReport(String city, String country) {
         this.locationName_city = city;
@@ -31,6 +33,7 @@ public class WeatherReport {
         this.minTemp = null;
         this.tomorrow = null;
         this.tonight = null;
+        this.thisReport_TAGInSavedPref = null;
     }
 
 
@@ -89,7 +92,7 @@ public class WeatherReport {
     //report_save_number will help us identify this recent save
     public void saveToSharedPreferences(Context context, String report_save_number) {
         //First, access shared preferences.
-        SharedPreferences sharedPref = context.getSharedPreferences(MainActivity.GLOBAL_SHARED_PREFERENCES, Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = context.getSharedPreferences(GLOBAL_SHARED_PREFERENCES, Context.MODE_PRIVATE);
 
 
         // There are a limited number of slots in the cache, which we're saving as "report_id."
@@ -112,6 +115,7 @@ public class WeatherReport {
             editor.remove(report_TAG + "minTemp");
             editor.remove(report_TAG + "tonight");
             editor.remove(report_TAG + "tomorrow");
+            editor.remove(locationName_city);
             editor.apply();
         }
 
@@ -137,14 +141,18 @@ public class WeatherReport {
         editor.putString(report_TAG + "minTemp", getMinTemp());
         editor.putString(report_TAG + "tonight", getTonight());
         editor.putString(report_TAG + "tomorrow", getTomorrow());
+
+        //We can use this locationName_city, report_TAG addition later for finding this report
+        //in a weatherbox.
+        editor.putString(locationName_city, report_save_number);
         editor.apply();
 
     }
 
     public void matchWithSharedPreferences(Context context, String report_save_number) {
-        SharedPreferences sharedPref = context.getSharedPreferences(MainActivity.GLOBAL_SHARED_PREFERENCES, Context.MODE_PRIVATE);
-        String report_id = "report"+report_save_number;
-        String report_TAG = sharedPref.getString(report_id, null);
+        SharedPreferences sharedPref = context.getSharedPreferences(GLOBAL_SHARED_PREFERENCES, Context.MODE_PRIVATE);
+        String report_slot = "report"+report_save_number;
+        String report_TAG = sharedPref.getString(report_slot, null);
         String city = sharedPref.getString(report_TAG +"locationName_city", null);
         String country = sharedPref.getString(report_TAG +"locationName_country", null);
         String time = sharedPref.getString(report_TAG +"time", null);
@@ -162,8 +170,6 @@ public class WeatherReport {
         updateWeatherReport(time, temperature, skyCondition, humidity, maxTemp, minTemp, tomorrow, tonight);
 
     }
-
-
 
 
 }
