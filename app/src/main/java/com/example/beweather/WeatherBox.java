@@ -1,12 +1,17 @@
 package com.example.beweather;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.fragment.app.FragmentManager;
+
 import com.example.beweather.model.WebViewModel;
 import com.example.beweather.weathercontroller.Controller;
 import com.example.beweather.weatherdata.WeatherImageProvider;
@@ -34,6 +39,7 @@ public class WeatherBox {
         private SharedPreferences sharedPref;
         public static String GLOBAL_SHARED_PREFERENCES = "global_shared_preferences";
         private String TAG_location;
+        public MainActivity mainActivity;
 
 
 
@@ -41,12 +47,13 @@ public class WeatherBox {
 
     //constructor needs views added from the activity
         public WeatherBox(
-                Context context, Controller controller, WebViewModel model,
+                Context context, MainActivity mainActivity, Controller controller, WebViewModel model,
                 EditText weatherSearchBar, WeatherBoxDetailsView weatherBoxDetailsView,
                 Button newWeatherBoxButton, ImageView addWeatherBoxButton, String wBoxId
         )
         {
             this.context = context;
+            this.mainActivity = mainActivity;
             this.controller = controller;
             this.model = model;
             this.TAG_location = "wBox" + wBoxId + "location";
@@ -103,7 +110,6 @@ public class WeatherBox {
 
                     WeatherReport grabbedReport = new WeatherReport("", "");
                     grabbedReport.matchWithSharedPreferences(context, thisWBoxId);
-
                     thisWeatherBoxWeatherReport = grabbedReport;
 
                     try {
@@ -217,7 +223,7 @@ public class WeatherBox {
 
 
     public void switchToWeatherDetails() {
-        this.thisWeatherBoxWeatherReport = model.getRecentReport();
+        //this.thisWeatherBoxWeatherReport = model.getRecentReport();
         if (nowDisplayingDetails) {
             weatherBoxDetailsView.removeAllViews();
             weatherBoxDetailsView.alterViewLayout_standardView(context);
@@ -242,12 +248,21 @@ public class WeatherBox {
             nowDisplayingDetails = true;
 
             try {
+
                 weatherBoxDetailsView.getWeatherViews_cityName().setText(this.thisWeatherBoxWeatherReport.getLocationName_city());
                 weatherBoxDetailsView.getWeatherViews_conditions().setText(this.thisWeatherBoxWeatherReport.getSkyCondition());
                 weatherBoxDetailsView.getWeatherViews_humidity().setText(this.thisWeatherBoxWeatherReport.getHumidity());
                 weatherBoxDetailsView.getWeatherViews_tonight().setText(this.thisWeatherBoxWeatherReport.getTemperature());
             } catch (Exception e) {
                 System.out.println("Error line 224");
+            }
+            try {
+                WeatherImageProvider weatherImageProvider = new WeatherImageProvider();
+                int drawableId = weatherImageProvider.getWeatherIconId(thisWeatherBoxWeatherReport);
+                int backgroundId = weatherImageProvider.getWeatherBackgroundId(thisWeatherBoxWeatherReport);
+                weatherBoxDetailsView.getDetailsViewLayoutBackground().setBackgroundResource(backgroundId);
+            } catch (Exception e) {
+                System.out.println("Error getting image for detail view");
             }
         }
 
@@ -266,6 +281,12 @@ public class WeatherBox {
     public void exitWeatherBoxInvisible() {
         weatherBoxDetailsView.removeAllViews();
         weatherDisplayPresets.exitAnimationOnlyAddButton();
+
+    }
+
+    public void triggerAd() {
+
+        mainActivity.triggerAd();
 
     }
 

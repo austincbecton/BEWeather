@@ -18,6 +18,7 @@ public class WeatherBoxGestureListener extends GestureDetector.SimpleOnGestureLi
     @Override
     public void onLongPress(MotionEvent e) {
         weatherBox.switchToWeatherDetails();
+        weatherBox.triggerAd();
         super.onLongPress(e);
     }
 

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1041482193574",
+    "project_id": "storm-72d3c",
+    "storage_bucket": "storm-72d3c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1041482193574:android:ffd5adbaf3b3eb0d6f7267",
+        "android_client_info": {
+          "package_name": "com.example.beweather"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1041482193574-bh2466uaj7fd5qsks2n8nicutk3n2cnp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCg_VacNXPBMOQR_owBRhxJ_T8lFGP71Js"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1041482193574-bh2466uaj7fd5qsks2n8nicutk3n2cnp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -13,24 +13,38 @@ import com.example.beweather.weatherdata.WeatherReport;
 
 public class WebViewModel extends ViewModel {
 
-    MutableLiveData<String> recentWeatherSearch_location;
-    MutableLiveData<String> recentWeatherSearch_temperature;
-    MutableLiveData<String> recentWeatherSearch_humidity;
-    MutableLiveData<String> recentWeatherSearch_skyConditions;
-    MutableLiveData<String> recentWeatherSearch_countryName;
+    private MutableLiveData<String> recentWeatherSearch_location;
+    private MutableLiveData<String> recentWeatherSearch_temperature;
+    private MutableLiveData<String> recentWeatherSearch_humidity;
+    private MutableLiveData<String> recentWeatherSearch_skyConditions;
+    private MutableLiveData<String> recentWeatherSearch_countryName;
+    private MutableLiveData<String> currentAccount;
+    private static WebViewModel thisInstance;
 
 
 
-    public WebViewModel(Context context) {
+    private WebViewModel(Context context) {
         //reportCache = ReportCache.getReportCache(context);
         this.recentWeatherSearch_location = new MutableLiveData<>();
         this.recentWeatherSearch_countryName = new MutableLiveData<>();
         this.recentWeatherSearch_humidity = new MutableLiveData<>();
         this.recentWeatherSearch_skyConditions = new MutableLiveData<>();
         this.recentWeatherSearch_temperature = new MutableLiveData<>();
+        this.currentAccount = new MutableLiveData<>();
         //setDefaultWeather();
 
     }
+
+    public static WebViewModel getWebViewModel(Context context) {
+        if (thisInstance == null) {
+            thisInstance = new WebViewModel(context);
+
+        }
+
+        return thisInstance;
+    }
+
+
 
     public void addWeatherReport(WeatherReport report, Context context) {
         report.saveToSharedPreferences(context, "cache");
@@ -72,8 +86,13 @@ public class WebViewModel extends ViewModel {
     }
 
 
+    public void setCurrentAccount(String firebaseId) {
+        this.currentAccount.setValue(firebaseId);
+    }
 
-
+    public String getCurrentAccountFromModel() {
+        return this.currentAccount.getValue();
+    }
 
 
     /*

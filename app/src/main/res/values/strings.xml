@@ -5,4 +5,9 @@
     <string name="detailView_label_conditions">Conditions</string>
     <string name="detailView_label_humidity">Humidity</string>
     <string name="detailView_label_tonight">Tonight</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="my_account">My Account</string>
+    <string name="go_premium">Go Premium</string>
+    <string name="sorry_coming_soon">We\'re sorry, this feature is coming soon.</string>
 </resources>

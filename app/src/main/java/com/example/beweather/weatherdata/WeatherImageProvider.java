@@ -13,7 +13,6 @@ public class WeatherImageProvider {
         iconType = "";
         backgroundType = "";
 
-
     }
 
     public Integer getWeatherIconId(WeatherReport weatherReport) {
@@ -72,11 +71,11 @@ public class WeatherImageProvider {
         } else if (backgroundType.equals("snow")) {
             return R.drawable.card_background_rain;
         } else if (backgroundType.equals("wind")) {
-            return R.drawable.card_background_rain;
+            return R.drawable.card_background_cloudy;
         } else if (backgroundType.equals("cloud") || iconType.equals("cloudy")) {
-            return R.drawable.card_background_rain;
+            return R.drawable.card_background_cloudy;
         } else if (backgroundType.equals("partlycloudy")) {
-            return R.drawable.card_background_rain;
+            return R.drawable.card_background_cloudy;
         } else if (backgroundType.equals("storm") || iconType.equals("stormy") || iconType.equals("storms")) {
             return R.drawable.card_background_rain;
         } else {return R.drawable.card_background_sunny;}

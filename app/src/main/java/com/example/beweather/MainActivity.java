@@ -1,52 +1,42 @@
 package com.example.beweather;
 
-import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.content.res.AppCompatResources;
-import androidx.cardview.widget.CardView;
-import androidx.constraintlayout.widget.Constraints;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GestureDetectorCompat;
-import androidx.core.view.MotionEventCompat;
-import androidx.transition.Transition;
-import androidx.transition.TransitionValues;
-
-import android.animation.ObjectAnimator;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Outline;
-import android.inputmethodservice.InputMethodService;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.util.Log;
-import android.view.GestureDetector;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowInsets;
-import android.view.WindowInsetsController;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
+import com.example.beweather.accounts.AccountFragment;
+import com.example.beweather.accounts.AccountManager;
 import com.example.beweather.model.WebViewModel;
 import com.example.beweather.weathercontroller.Controller;
-import com.example.beweather.weatherdata.WeatherReport;
-
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
+import com.google.android.material.bottomnavigation.BottomNavigationMenuView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class MainActivity extends AppCompatActivity {
 
+public class MainActivity extends AppCompatActivity {
 
     public Controller controller;
     SharedPreferences sharedPref;
@@ -55,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     Button update_screen_button;
     EditText weatherSearchBar;
     Button enterWeatherButton;
+    BottomNavigationMenuView bottomNavigationMenu;
 
     Button newWeatherBoxButton_1;
     Button newWeatherBoxButton_2;
@@ -72,12 +63,13 @@ public class MainActivity extends AppCompatActivity {
     WeatherBox weatherBox2;
     WeatherBox weatherBox3;
 
-    //WeatherIconView weatherIconView;
+    AccountManager accountManager;
+    public static final String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
 
 
     private ExecutorService backgroundThread = Executors.newSingleThreadExecutor();
     public static String GLOBAL_SHARED_PREFERENCES = "global_shared_preferences";
-
+    private InterstitialAd mInterstitialAd;
 
 
     @SuppressLint({"ClickableViewAccessibility", "NewApi"})
@@ -86,38 +78,43 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_main);
-
+        MobileAds.initialize(this);
 
         //get utilities set up
-        model = new WebViewModel(this);
+        model = WebViewModel.getWebViewModel(this);
         sharedPref = getSharedPreferences(GLOBAL_SHARED_PREFERENCES, Context.MODE_PRIVATE);
-
-
         controller = Controller.getController(this);
-        //model.syncReportCache();
         Window window = this.getWindow();
         window.setStatusBarColor(ContextCompat.getColor(this,R.color.standard_text_color));
-        /*
-        WindowInsetsController windowControls = window.getInsetsController();
-        windowControls.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_BARS_BY_TOUCH);
 
-         */
+        accountManager = new AccountManager(this, model);
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
 
+        //Already logged in
+        if (accountManager.checkIfLoggedIn()) { }
 
-/*
-        //get the most recently searched-for weather, if it exists
-        if (model.getCurrentWeatherReport() != null) {
-            //Nothing, just set the weather display items
-        } else if (sharedPref.getString("report1",null) != null) {
-            model.syncReportCache();
-        } else {
-            controller.submitRequest("Dayton, OH", model);
+        //Logged into firebase, but not the local app/account
+        else if (user != null) {
+
         }
 
- */
+        else if (model.getCurrentAccountFromModel() != null) {
+            accountManager.setRecentUser(model.getCurrentAccountFromModel());
+        }
 
+        //Not logged in
+        else {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction()
+                    .setReorderingAllowed(true)
+                    .add(R.id.parentLayout, AccountFragment.class, null)
+                    .commit();
+
+        }
+
+
+        setContentView(R.layout.activity_main);
 
 
         //Set up views
@@ -147,7 +144,6 @@ public class MainActivity extends AppCompatActivity {
 
         });
 
-
         //The views/layouts that we'll pass to WeatherBox objects.
         weatherBoxView1 = findViewById(R.id.weatherBoxView1);
         weatherBoxView2 = findViewById(R.id.weatherBoxView2);
@@ -158,14 +154,15 @@ public class MainActivity extends AppCompatActivity {
         //weatherBoxView3.setUpView(this);
 
         //Each weatherbox needs an ID, which will help it access its unique shared preferences file
-        String wBoxId_1 = "wBox1";
-        String wBoxId_2 = "wBox2";
-        String wBoxId_3 = "wBox3";
+        //We'll add current account to make sure each user sees only their own chosen weather displays
+        String wBoxId_1 = "wBox1"+accountManager.getCurrentAccount().getNickname();
+        String wBoxId_2 = "wBox2"+accountManager.getCurrentAccount().getNickname();
+        String wBoxId_3 = "wBox3"+accountManager.getCurrentAccount().getNickname();
 
         //Pass to views to WeatherBox
-        weatherBox1 = new WeatherBox(this, controller, model, weatherSearchBar, weatherBoxView1, newWeatherBoxButton_1, addButton_1, wBoxId_1);
-        weatherBox2 = new WeatherBox(this, controller, model, weatherSearchBar, weatherBoxView2, newWeatherBoxButton_2, addButton_2, wBoxId_2);
-        weatherBox3 = new WeatherBox(this, controller, model, weatherSearchBar, weatherBoxView3, newWeatherBoxButton_3, addButton_3, wBoxId_3);
+        weatherBox1 = new WeatherBox(this, this, controller, model, weatherSearchBar, weatherBoxView1, newWeatherBoxButton_1, addButton_1, wBoxId_1);
+        weatherBox2 = new WeatherBox(this, this, controller, model, weatherSearchBar, weatherBoxView2, newWeatherBoxButton_2, addButton_2, wBoxId_2);
+        weatherBox3 = new WeatherBox(this, this, controller, model, weatherSearchBar, weatherBoxView3, newWeatherBoxButton_3, addButton_3, wBoxId_3);
 
         weatherBoxView1.setLongClickable(true);
         weatherBoxView1.setOnTouchListener(new View.OnTouchListener() {
@@ -183,7 +180,6 @@ public class MainActivity extends AppCompatActivity {
         weatherBoxView2.setLongClickable(true);
         weatherBoxView2.setOnTouchListener(new View.OnTouchListener() {
 
-
             private GestureDetectorCompat gestureDetector = new GestureDetectorCompat(getApplicationContext(), new WeatherBoxGestureListener(weatherBox2));
 
             @Override
@@ -191,7 +187,6 @@ public class MainActivity extends AppCompatActivity {
                 this.gestureDetector.onTouchEvent(event);
                 return false;
             }
-
 
         });
 
@@ -207,11 +202,51 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        findViewById(R.id.menu_option_account).setOnClickListener(View -> {
+
+            weatherBoxView1.removeAllViews();
+            weatherBoxView2.removeAllViews();
+            weatherBoxView3.removeAllViews();
+            weatherSearchBar.setVisibility(android.view.View.GONE);
+            enterWeatherButton.setVisibility(android.view.View.GONE);
+            addButton_1.setVisibility(android.view.View.GONE);
+            addButton_2.setVisibility(android.view.View.GONE);
+            addButton_3.setVisibility(android.view.View.GONE);
+            newWeatherBoxButton_1.setVisibility(android.view.View.GONE);
+            newWeatherBoxButton_2.setVisibility(android.view.View.GONE);
+            newWeatherBoxButton_3.setVisibility(android.view.View.GONE);
+
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            transaction.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
+            transaction.setReorderingAllowed(true);
+            transaction.add(R.id.parentLayout, AccountFragment.class, null).commit();
+
+        });
+
+        findViewById(R.id.menu_option_weather).setOnClickListener(View -> {
+            weatherBox1.generateWeatherBox();
+            weatherBox2.generateWeatherBox();
+            weatherBox3.generateWeatherBox();
+            weatherSearchBar.setVisibility(android.view.View.VISIBLE);
+            enterWeatherButton.setVisibility(android.view.View.VISIBLE);
+            addButton_1.setVisibility(android.view.View.VISIBLE);
+            addButton_2.setVisibility(android.view.View.VISIBLE);
+            addButton_3.setVisibility(android.view.View.VISIBLE);
+            newWeatherBoxButton_1.setVisibility(android.view.View.VISIBLE);
+            newWeatherBoxButton_2.setVisibility(android.view.View.VISIBLE);
+            newWeatherBoxButton_3.setVisibility(android.view.View.VISIBLE);
+
+
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            transaction.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
+            transaction.addToBackStack(null);
+            transaction.remove(fragmentManager.findFragmentById(R.id.parentLayout)).commit();
+
+        });
+
     }
-
-
-
-
 
 
     public void showSoftKeyboard(View view) {
@@ -222,6 +257,42 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+
+
+
+    public void triggerAd() {
+        AdRequest adRequest = new AdRequest.Builder().build();
+
+        MobileAds.initialize(this);
+
+        InterstitialAd.load(this,"ca-app-pub-3940256099942544/1033173712", adRequest,
+                new InterstitialAdLoadCallback() {
+                    @Override
+                    public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                        // The mInterstitialAd reference will be null until
+                        // an ad is loaded.
+                        mInterstitialAd = interstitialAd;
+                        Log.i("TAG", "onAdLoaded");
+
+                        if (mInterstitialAd != null) {
+                            mInterstitialAd.show(MainActivity.this);
+                        } else {
+                            Log.d("TAG", "The interstitial ad wasn't ready yet.");
+                        }
+                    }
+
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        // Handle the error
+                        Log.i("TAG", loadAdError.getMessage());
+                        mInterstitialAd = null;
+                    }
+                });
+
+
+    }
+
+
 
 
 
