@@ -14,8 +14,8 @@ public class ReportCacheTest {
     public void cache_saves_correctly(Context context) {
         WeatherReport dummyWeather = new WeatherReport("Dayton", "United States");
         //dummyWeather.updateWeatherReport("10pm", "80", "sunny", "70");
-        WebViewModel model = new WebViewModel(context);
-        model.addWeatherReport(dummyWeather, context);
+        //WebViewModel model = new WebViewModel(context);
+        //model.addWeatherReport(dummyWeather, context);
 
         SharedPreferences sharedPref = context.getSharedPreferences(MainActivity.GLOBAL_SHARED_PREFERENCES, Context.MODE_PRIVATE);
         String report_TAG = sharedPref.getString("report1", null);

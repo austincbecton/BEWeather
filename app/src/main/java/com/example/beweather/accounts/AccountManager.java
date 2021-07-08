@@ -64,8 +64,8 @@ public class AccountManager {
 
     public StormAccount getCurrentAccount() {
         if (recentUserIsLoggedIn) {
-            StormAccount thisAccount = new StormAccount(getRecentUser(), context);
-            thisAccount.syncAccount();
+            StormAccount thisAccount = new StormAccount();
+            //thisAccount.saveToDatabase(model);
             return thisAccount;
         } else {
             return null;}

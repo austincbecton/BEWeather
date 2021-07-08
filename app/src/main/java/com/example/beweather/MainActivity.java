@@ -58,11 +58,9 @@ public class MainActivity extends AppCompatActivity {
     WeatherBoxDetailsView weatherBoxView1;
     WeatherBoxDetailsView weatherBoxView2;
     WeatherBoxDetailsView weatherBoxView3;
-
     WeatherBox weatherBox1;
     WeatherBox weatherBox2;
     WeatherBox weatherBox3;
-
     AccountManager accountManager;
     public static final String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
 
@@ -81,26 +79,30 @@ public class MainActivity extends AppCompatActivity {
         MobileAds.initialize(this);
 
         //get utilities set up
-        model = WebViewModel.getWebViewModel(this);
+        model = WebViewModel.getWebViewModel(this, this);
         sharedPref = getSharedPreferences(GLOBAL_SHARED_PREFERENCES, Context.MODE_PRIVATE);
         controller = Controller.getController(this);
         Window window = this.getWindow();
         window.setStatusBarColor(ContextCompat.getColor(this,R.color.standard_text_color));
-
         accountManager = new AccountManager(this, model);
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-
-        //Already logged in
-        if (accountManager.checkIfLoggedIn()) { }
-
-        //Logged into firebase, but not the local app/account
-        else if (user != null) {
-
+        if (user == null) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction()
+                    .setReorderingAllowed(true)
+                    .add(R.id.parentLayout, AccountFragment.class, null)
+                    .commit();
         }
 
+
+        //Already logged in
+        if (model.getCurrentAccountFromModel() != null &
+            model.getCurrentAccountFromModel().equals(user.getUid())) { }
+
+
         else if (model.getCurrentAccountFromModel() != null) {
-            accountManager.setRecentUser(model.getCurrentAccountFromModel());
+            model.setCurrentAccount(user.getUid());
         }
 
         //Not logged in
@@ -207,14 +209,14 @@ public class MainActivity extends AppCompatActivity {
             weatherBoxView1.removeAllViews();
             weatherBoxView2.removeAllViews();
             weatherBoxView3.removeAllViews();
-            weatherSearchBar.setVisibility(android.view.View.GONE);
-            enterWeatherButton.setVisibility(android.view.View.GONE);
-            addButton_1.setVisibility(android.view.View.GONE);
-            addButton_2.setVisibility(android.view.View.GONE);
-            addButton_3.setVisibility(android.view.View.GONE);
-            newWeatherBoxButton_1.setVisibility(android.view.View.GONE);
-            newWeatherBoxButton_2.setVisibility(android.view.View.GONE);
-            newWeatherBoxButton_3.setVisibility(android.view.View.GONE);
+            weatherSearchBar.setVisibility(android.view.View.INVISIBLE);
+            enterWeatherButton.setVisibility(android.view.View.INVISIBLE);
+            addButton_1.setVisibility(android.view.View.INVISIBLE);
+            addButton_2.setVisibility(android.view.View.INVISIBLE);
+            addButton_3.setVisibility(android.view.View.INVISIBLE);
+            newWeatherBoxButton_1.setVisibility(android.view.View.INVISIBLE);
+            newWeatherBoxButton_2.setVisibility(android.view.View.INVISIBLE);
+            newWeatherBoxButton_3.setVisibility(android.view.View.INVISIBLE);
 
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction transaction = fragmentManager.beginTransaction();
@@ -291,10 +293,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-
-
-
-
 
 
 

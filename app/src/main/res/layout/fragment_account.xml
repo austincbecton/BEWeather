@@ -12,9 +12,9 @@
         android:layout_height="match_parent"
         android:layout_marginBottom="50dp"
         android:background="@color/white"
-
-
         >
+
+
 
         <androidx.cardview.widget.CardView
             android:id="@+id/my_account_card"
@@ -73,6 +73,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/title_my_account_name" />
 
                 <com.google.android.material.navigation.NavigationView
+                    android:id="@+id/account_navigation_menu"
                     android:layout_width="301dp"
                     android:layout_height="119dp"
                     app:layout_constraintBottom_toBottomOf="parent"

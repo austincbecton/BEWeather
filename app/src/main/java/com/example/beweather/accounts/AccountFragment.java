@@ -7,39 +7,58 @@ import android.os.Bundle;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.example.beweather.MainActivity;
 import com.example.beweather.R;
 import com.example.beweather.model.WebViewModel;
+import com.example.beweather.weatherdata.WeatherReport;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
 import com.firebase.ui.auth.IdpResponse;
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import org.w3c.dom.Text;
+
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 
 public class AccountFragment extends Fragment {
     WebViewModel model;
     FirebaseUser user;
+    StormAccount thisAccount;
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
     private String mParam1;
     private String mParam2;
+
+    private static final int NUMBER_OF_THREADS = 4;
+    static final ExecutorService backgroundWriteExecutor =
+            Executors.newFixedThreadPool(NUMBER_OF_THREADS);
+
+    public Button logoutButton;
 
     public AccountFragment() {
         // Required empty public constructor
     }
-
 
     public static AccountFragment newInstance(String param1, String param2) {
         AccountFragment fragment = new AccountFragment();
@@ -58,7 +77,7 @@ public class AccountFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
-        model = model.getWebViewModel(getContext());
+        model = model.getWebViewModel(getContext(), getActivity());
         user = FirebaseAuth.getInstance().getCurrentUser();
 
 
@@ -77,41 +96,98 @@ public class AccountFragment extends Fragment {
                     model.getCurrentAccountFromModel().isEmpty() ||
                     model.getCurrentAccountFromModel().equals("123")) {
 
-                // Choose authentication providers
-                List<AuthUI.IdpConfig> providers = Arrays.asList(
-                        new AuthUI.IdpConfig.EmailBuilder().build(),
-                        new AuthUI.IdpConfig.PhoneBuilder().build(),
-                        new AuthUI.IdpConfig.GoogleBuilder().build()
-                );
+                logIn();
 
-                // Create and launch sign-in intent
-                Intent signInIntent = AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        .setAvailableProviders(providers)
-                        .build();
-                signInLauncher.launch(signInIntent);
+            } else {
+                System.out.println("WERE IN" + user.getUid());
+                System.out.println(model.getCurrentAccountFromModel());
             }
 
         } else {
 
-
-            // Choose authentication providers
-            List<AuthUI.IdpConfig> providers = Arrays.asList(
-                    new AuthUI.IdpConfig.EmailBuilder().build(),
-                    new AuthUI.IdpConfig.PhoneBuilder().build(),
-                    new AuthUI.IdpConfig.GoogleBuilder().build()
-            );
-
-            // Create and launch sign-in intent
-            Intent signInIntent = AuthUI.getInstance()
-                    .createSignInIntentBuilder()
-                    .setAvailableProviders(providers)
-                    .build();
-            signInLauncher.launch(signInIntent);
+            logOutFirebase();
         }
+
+
+
+
 
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_account, container, false);
+
+
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        TextView title_my_account_name = view.findViewById(R.id.title_my_account_name);
+        TextView title_my_account_level = view.findViewById(R.id.title_my_account_level);
+
+
+        final Observer<String> currentUserObserver = new Observer<String>() {
+
+            @Override
+            public void onChanged(@Nullable final String currentAccountId) {
+
+                backgroundWriteExecutor.execute(() -> {
+                    System.out.println("CURRENT USER IS " + user.getUid());
+                    System.out.println("CURRENT USER IS (IN MODEL): " + currentAccountId);
+                    if (!currentAccountId.equals(user.getUid())) {
+
+                        thisAccount = new StormAccount();
+                        thisAccount.setFirebaseId(user.getUid());
+                        thisAccount.setNickname(user.getDisplayName());
+                        thisAccount.setMembership(user.getDisplayName());
+                        if (model.getAccountFromDatabase(user.getUid()) == null) {
+                            model.saveAccountInStormDatabase(thisAccount);
+                        } else {
+                            model.updateAccount(thisAccount);
+                        }
+                        title_my_account_name.setText(thisAccount.getNickname());
+                        title_my_account_level.setText(thisAccount.getFirebaseId());
+
+                    } else {
+                        thisAccount = new StormAccount();
+                        thisAccount.setFirebaseId(user.getUid());
+                        thisAccount.setNickname(user.getDisplayName());
+                        thisAccount.setMembership(user.getDisplayName());
+                        title_my_account_name.setText(thisAccount.getNickname());
+                        title_my_account_level.setText(thisAccount.getFirebaseId());
+                    }
+
+
+                });
+
+
+
+
+
+
+            }
+
+
+        };
+
+
+        model.currentAccount.observe(getViewLifecycleOwner(), currentUserObserver);
+
+
+
+        NavigationView accountOptions = view.findViewById(R.id.account_navigation_menu);
+        accountOptions.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull  MenuItem item) {
+                if (item.getTitle().toString().equals("delete account")) {
+                    logOutFirebase();
+                }
+                return false;
+            }
+        });
+
+
+
 
 
 
@@ -132,11 +208,22 @@ public class AccountFragment extends Fragment {
         IdpResponse response = result.getIdpResponse();
         if (result.getResultCode() == Activity.RESULT_OK) {
             // Successfully signed in
-            model.setCurrentAccount(
-                    FirebaseAuth.getInstance().getUid()
-            );
+            model.setCurrentAccount(FirebaseAuth.getInstance().getUid());
+            StormAccount account = new StormAccount();
+            account.setFirebaseId(model.getCurrentAccountFromModel());
+            account.setNickname("unknownName");
+            account.setMembership("basic");
+            backgroundWriteExecutor.execute(() ->{
+                if (model.getAccountFromDatabase(model.getCurrentAccountFromModel()) != null) {
+                    model.updateAccount(account);
+                } else {
+                    model.saveAccountInStormDatabase(account);
+                }
+            });
 
-            System.out.println("SET MODEL");
+
+            model.setCurrentAccount(account.getFirebaseId());
+            System.out.println(account.getNickname());
             System.out.println(model.getCurrentAccountFromModel());
 
             // ...
@@ -144,6 +231,40 @@ public class AccountFragment extends Fragment {
             System.out.println("DID NOT SET MODEL");
 
         }
+    }
+
+
+
+    public void logOutFirebase() {
+
+        AuthUI.getInstance()
+                .signOut(getContext())
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    public void onComplete(@NonNull Task<Void> task) {
+                        logIn();
+                    }
+                });
+
+
+    }
+
+    public void logIn() {
+        FirebaseAuth.getInstance().signOut();
+        // Choose authentication providers
+        List<AuthUI.IdpConfig> providers = Arrays.asList(
+                new AuthUI.IdpConfig.EmailBuilder().build(),
+                new AuthUI.IdpConfig.PhoneBuilder().build(),
+                new AuthUI.IdpConfig.GoogleBuilder().build()
+        );
+
+        // Create and launch sign-in intent
+        Intent signInIntent = AuthUI.getInstance()
+                .createSignInIntentBuilder()
+                .setAvailableProviders(providers)
+                .build();
+        signInLauncher.launch(signInIntent);
+
+
     }
 
 

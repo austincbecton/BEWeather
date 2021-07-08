@@ -3,22 +3,36 @@ package com.example.beweather.accounts;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+import com.example.beweather.model.WebViewModel;
+
+@Entity(tableName = "stormAccounts_table")
 public class StormAccount {
 
-    private String nickname;
-    private String firebaseId;
-    private String membership;
-    public static String GLOBAL_SHARED_PREFERENCES = "global_shared_preferences";
-    public SharedPreferences sharedPref;
-    public Context context;
+    @NonNull
+    @PrimaryKey(autoGenerate = true)
+    private int localDatabaseItemId;
 
-    public StormAccount(String firebaseId, Context context) {
-        this.nickname = "";
-        this.firebaseId = firebaseId;
+    @NonNull
+    private String firebaseId;
+
+    @NonNull
+    private String nickname;
+
+    @NonNull
+    private String membership;
+
+    @NonNull
+    public static String GLOBAL_SHARED_PREFERENCES = "global_shared_preferences";
+
+    public StormAccount() {
+        this.nickname = "noName";
+        this.firebaseId = "noFirebaseId";
         this.membership = "basic";
-        this.context = context;
-        this.sharedPref = context.getSharedPreferences(GLOBAL_SHARED_PREFERENCES,
-                Context.MODE_PRIVATE);
 
     }
 
@@ -44,27 +58,19 @@ public class StormAccount {
         this.membership = membership;
     }
 
-    public void syncAccount() {
-        this.nickname = sharedPref.getString(getFirebaseId()+"accountName", null);
-        this.firebaseId = sharedPref.getString(getFirebaseId()+"accountId", null);
-        this.membership = sharedPref.getString(getFirebaseId()+"accountMembership", null);
+    public int getLocalDatabaseItemId() {
+        return localDatabaseItemId;
     }
 
-    public void saveToSharedPreferences() {
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(getFirebaseId()+"accountName", getFirebaseId());
-        editor.putString(getFirebaseId()+"accountId", getFirebaseId());
-        editor.putString(getFirebaseId()+"accountMembership", getFirebaseId());
-        editor.apply();
+    public void setLocalDatabaseItemId(int localDatabaseItemId) {
+        this.localDatabaseItemId = localDatabaseItemId;
+    }
+/*
+    public void saveToDatabase(WebViewModel webViewModel) {
+        webViewModel.saveAccountInStormDatabase(this);
     }
 
-    public void deleteAccount() {
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.remove(getFirebaseId()+"accountName");
-        editor.remove(getFirebaseId()+"accountId");
-        editor.remove(getFirebaseId()+"accountMembership");
-        editor.commit();
-    }
+ */
 
 
 

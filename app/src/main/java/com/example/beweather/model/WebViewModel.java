@@ -1,10 +1,15 @@
 package com.example.beweather.model;
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 
 import androidx.annotation.RequiresApi;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+
+import com.example.beweather.accounts.StormAccount;
 import com.example.beweather.weathercontroller.Controller;
 import com.example.beweather.weatherdata.ReportCache;
 import com.example.beweather.weatherdata.WeatherReport;
@@ -18,12 +23,17 @@ public class WebViewModel extends ViewModel {
     private MutableLiveData<String> recentWeatherSearch_humidity;
     private MutableLiveData<String> recentWeatherSearch_skyConditions;
     private MutableLiveData<String> recentWeatherSearch_countryName;
-    private MutableLiveData<String> currentAccount;
+    public MutableLiveData<String> currentAccount;
+
+    public SharedPreferences sharedPref;
+    public static String GLOBAL_SHARED_PREFERENCES = "global_shared_preferences";
+    private String CURRENT_ACCOUNT = "current_account";
+
     private static WebViewModel thisInstance;
+    private StormRepository stormRepository;
 
 
-
-    private WebViewModel(Context context) {
+    public WebViewModel(Context context, Activity activity) {
         //reportCache = ReportCache.getReportCache(context);
         this.recentWeatherSearch_location = new MutableLiveData<>();
         this.recentWeatherSearch_countryName = new MutableLiveData<>();
@@ -31,13 +41,17 @@ public class WebViewModel extends ViewModel {
         this.recentWeatherSearch_skyConditions = new MutableLiveData<>();
         this.recentWeatherSearch_temperature = new MutableLiveData<>();
         this.currentAccount = new MutableLiveData<>();
-        //setDefaultWeather();
+        this.sharedPref = context.getSharedPreferences(GLOBAL_SHARED_PREFERENCES,
+                                                                    Context.MODE_PRIVATE);
+
+        currentAccount.setValue(sharedPref.getString(CURRENT_ACCOUNT, ""));
+        this.stormRepository = new StormRepository(activity.getApplication());
 
     }
 
-    public static WebViewModel getWebViewModel(Context context) {
+    public static WebViewModel getWebViewModel(Context context, Activity activity) {
         if (thisInstance == null) {
-            thisInstance = new WebViewModel(context);
+            thisInstance = new WebViewModel(context, activity);
 
         }
 
@@ -63,7 +77,6 @@ public class WebViewModel extends ViewModel {
         System.out.println(recentWeatherSearch_skyConditions.getValue());
         System.out.println(recentWeatherSearch_humidity.getValue());
 
-
     }
 
     public WeatherReport getRecentReport() {
@@ -87,7 +100,11 @@ public class WebViewModel extends ViewModel {
 
 
     public void setCurrentAccount(String firebaseId) {
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(CURRENT_ACCOUNT, firebaseId);
+        editor.apply();
         this.currentAccount.setValue(firebaseId);
+
     }
 
     public String getCurrentAccountFromModel() {
@@ -95,50 +112,19 @@ public class WebViewModel extends ViewModel {
     }
 
 
-    /*
-
-    public WeatherReport getRecentWeatherReport() {
-
-        return reportCache.getNextLocation();
+    public void saveAccountInStormDatabase(StormAccount stormAccount) {
+        stormRepository.insert(stormAccount);
     }
 
-    public WeatherReport getCurrentWeatherReport() {
+    public StormAccount getAccountFromDatabase(String firebaseId) {
+        return stormRepository.getAccount(firebaseId).getValue();
+    }
 
-        try { return reportCache.getCurrentLocation();
-
-        } catch (Exception e) {
-            System.out.println("ERROR GETTING CURRENT REPORT");
-
-            try {
-                reportCache.syncReportCacheWithSharedPreferences();
-            } catch (Exception e2) {
-                System.out.println("Error syncing report cache");
-            }
-            return null;
-        }
-
+    public void updateAccount(StormAccount stormAccount) {
+        stormRepository.update(stormAccount);
     }
 
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    public void addWeatherReport(WeatherReport newReport) {
-        reportCache.addReport(newReport);
-        saveReportCache();
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    public void saveReportCache() {
-        reportCache.sharedPreferences_handler_addAllReports();
-    }
-
-
-    public void syncReportCache() {
-        reportCache.syncReportCacheWithSharedPreferences();
-    }
-
-
-
-     */
 
 
 
