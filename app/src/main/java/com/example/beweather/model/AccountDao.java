@@ -15,7 +15,7 @@ import java.util.List;
 @Dao
 public interface AccountDao {
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(StormAccount account);
 
 
@@ -33,8 +33,10 @@ public interface AccountDao {
     LiveData<List<StormAccount>> getAll() ;
 
     @Query ("SELECT * FROM stormAccounts_table WHERE firebaseId = :id")
-    LiveData<StormAccount> getAccount(String id);
+    LiveData<StormAccount> getAccount(int id);
 
+    @Query("SELECT * FROM stormAccounts_table ")
+    List<StormAccount> getAll_nonLiveData();
 
 
 

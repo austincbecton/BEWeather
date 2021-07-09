@@ -14,6 +14,8 @@ import com.example.beweather.weathercontroller.Controller;
 import com.example.beweather.weatherdata.ReportCache;
 import com.example.beweather.weatherdata.WeatherReport;
 
+import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 
 public class WebViewModel extends ViewModel {
@@ -24,6 +26,7 @@ public class WebViewModel extends ViewModel {
     private MutableLiveData<String> recentWeatherSearch_skyConditions;
     private MutableLiveData<String> recentWeatherSearch_countryName;
     public MutableLiveData<String> currentAccount;
+
 
     public SharedPreferences sharedPref;
     public static String GLOBAL_SHARED_PREFERENCES = "global_shared_preferences";
@@ -113,15 +116,45 @@ public class WebViewModel extends ViewModel {
 
 
     public void saveAccountInStormDatabase(StormAccount stormAccount) {
+
+
+
         stormRepository.insert(stormAccount);
+
+
+
     }
 
-    public StormAccount getAccountFromDatabase(String firebaseId) {
-        return stormRepository.getAccount(firebaseId).getValue();
+    public StormAccount getAccountFromDatabase(int localId) {
+        return stormRepository.getAccount(localId).getValue();
     }
 
     public void updateAccount(StormAccount stormAccount) {
         stormRepository.update(stormAccount);
+    }
+
+    public void deleteAccount(StormAccount stormAccount) {
+
+        stormRepository.deleteAccount(stormAccount);
+    }
+
+
+    public ArrayList<StormAccount> getAllAccounts() {
+        ArrayList<StormAccount> allAccountsList = new ArrayList<>();
+
+        try {
+            allAccountsList.addAll(stormRepository.getAllAccounts().getValue());
+        }catch (Exception e) {
+            System.out.println("Error getting all accounts in the view model.");
+            StormAccount dummyAccount = new StormAccount();
+            dummyAccount.setMembership("dummyacct");
+            dummyAccount.setNickname("dummyacct");
+            dummyAccount.setFirebaseId("dummyacct");
+            stormRepository.insert(dummyAccount);
+        }
+
+        return allAccountsList;
+
     }
 
 

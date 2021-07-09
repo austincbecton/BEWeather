@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.OnConflictStrategy;
 import androidx.room.PrimaryKey;
 
 import com.example.beweather.model.WebViewModel;
@@ -14,10 +15,7 @@ import com.example.beweather.model.WebViewModel;
 public class StormAccount {
 
     @NonNull
-    @PrimaryKey(autoGenerate = true)
-    private int localDatabaseItemId;
-
-    @NonNull
+    @PrimaryKey
     private String firebaseId;
 
     @NonNull
@@ -58,13 +56,9 @@ public class StormAccount {
         this.membership = membership;
     }
 
-    public int getLocalDatabaseItemId() {
-        return localDatabaseItemId;
-    }
 
-    public void setLocalDatabaseItemId(int localDatabaseItemId) {
-        this.localDatabaseItemId = localDatabaseItemId;
-    }
+
+
 /*
     public void saveToDatabase(WebViewModel webViewModel) {
         webViewModel.saveAccountInStormDatabase(this);

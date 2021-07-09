@@ -35,7 +35,6 @@ import com.google.firebase.auth.FirebaseUser;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-
 public class MainActivity extends AppCompatActivity {
 
     public Controller controller;
@@ -62,13 +61,12 @@ public class MainActivity extends AppCompatActivity {
     WeatherBox weatherBox2;
     WeatherBox weatherBox3;
     AccountManager accountManager;
+    private Boolean ACCOUNT_FRAG_ON;
     public static final String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
-
 
     private ExecutorService backgroundThread = Executors.newSingleThreadExecutor();
     public static String GLOBAL_SHARED_PREFERENCES = "global_shared_preferences";
     private InterstitialAd mInterstitialAd;
-
 
     @SuppressLint({"ClickableViewAccessibility", "NewApi"})
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -80,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
 
         //get utilities set up
         model = WebViewModel.getWebViewModel(this, this);
+        ACCOUNT_FRAG_ON = false;
         sharedPref = getSharedPreferences(GLOBAL_SHARED_PREFERENCES, Context.MODE_PRIVATE);
         controller = Controller.getController(this);
         Window window = this.getWindow();
@@ -87,33 +86,6 @@ public class MainActivity extends AppCompatActivity {
         accountManager = new AccountManager(this, model);
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-        if (user == null) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction()
-                    .setReorderingAllowed(true)
-                    .add(R.id.parentLayout, AccountFragment.class, null)
-                    .commit();
-        }
-
-
-        //Already logged in
-        if (model.getCurrentAccountFromModel() != null &
-            model.getCurrentAccountFromModel().equals(user.getUid())) { }
-
-
-        else if (model.getCurrentAccountFromModel() != null) {
-            model.setCurrentAccount(user.getUid());
-        }
-
-        //Not logged in
-        else {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction()
-                    .setReorderingAllowed(true)
-                    .add(R.id.parentLayout, AccountFragment.class, null)
-                    .commit();
-
-        }
 
 
         setContentView(R.layout.activity_main);
@@ -157,9 +129,20 @@ public class MainActivity extends AppCompatActivity {
 
         //Each weatherbox needs an ID, which will help it access its unique shared preferences file
         //We'll add current account to make sure each user sees only their own chosen weather displays
-        String wBoxId_1 = "wBox1"+accountManager.getCurrentAccount().getNickname();
-        String wBoxId_2 = "wBox2"+accountManager.getCurrentAccount().getNickname();
-        String wBoxId_3 = "wBox3"+accountManager.getCurrentAccount().getNickname();
+
+        String wBoxId_1;
+        String wBoxId_2;
+        String wBoxId_3;
+        try {
+
+            wBoxId_1 = "wBox1"+model.getCurrentAccountFromModel();
+            wBoxId_2 = "wBox2"+model.getCurrentAccountFromModel();
+            wBoxId_3 = "wBox3"+model.getCurrentAccountFromModel();
+        } catch (Exception e) {
+            wBoxId_1 = "wBox1"+"temporary";
+            wBoxId_2 = "wBox2"+"temporary";
+            wBoxId_3 = "wBox3"+"temporary";
+        }
 
         //Pass to views to WeatherBox
         weatherBox1 = new WeatherBox(this, this, controller, model, weatherSearchBar, weatherBoxView1, newWeatherBoxButton_1, addButton_1, wBoxId_1);
@@ -206,47 +189,55 @@ public class MainActivity extends AppCompatActivity {
 
         findViewById(R.id.menu_option_account).setOnClickListener(View -> {
 
-            weatherBoxView1.removeAllViews();
-            weatherBoxView2.removeAllViews();
-            weatherBoxView3.removeAllViews();
-            weatherSearchBar.setVisibility(android.view.View.INVISIBLE);
-            enterWeatherButton.setVisibility(android.view.View.INVISIBLE);
-            addButton_1.setVisibility(android.view.View.INVISIBLE);
-            addButton_2.setVisibility(android.view.View.INVISIBLE);
-            addButton_3.setVisibility(android.view.View.INVISIBLE);
-            newWeatherBoxButton_1.setVisibility(android.view.View.INVISIBLE);
-            newWeatherBoxButton_2.setVisibility(android.view.View.INVISIBLE);
-            newWeatherBoxButton_3.setVisibility(android.view.View.INVISIBLE);
-
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
-            transaction.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
-            transaction.setReorderingAllowed(true);
-            transaction.add(R.id.parentLayout, AccountFragment.class, null).commit();
+            openAccountFragment();
 
         });
 
         findViewById(R.id.menu_option_weather).setOnClickListener(View -> {
-            weatherBox1.generateWeatherBox();
-            weatherBox2.generateWeatherBox();
-            weatherBox3.generateWeatherBox();
-            weatherSearchBar.setVisibility(android.view.View.VISIBLE);
-            enterWeatherButton.setVisibility(android.view.View.VISIBLE);
-            addButton_1.setVisibility(android.view.View.VISIBLE);
-            addButton_2.setVisibility(android.view.View.VISIBLE);
-            addButton_3.setVisibility(android.view.View.VISIBLE);
-            newWeatherBoxButton_1.setVisibility(android.view.View.VISIBLE);
-            newWeatherBoxButton_2.setVisibility(android.view.View.VISIBLE);
-            newWeatherBoxButton_3.setVisibility(android.view.View.VISIBLE);
-
-
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
-            transaction.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
-            transaction.addToBackStack(null);
-            transaction.remove(fragmentManager.findFragmentById(R.id.parentLayout)).commit();
+            closeAccountFragment();
 
         });
+
+
+        if (user == null) {
+            System.out.println("user is null, so opening account fragment");
+            openAccountFragment();
+
+        }
+
+
+        //Already logged in
+        if (model.getCurrentAccountFromModel() != null) {
+
+            try {
+                System.out.println("user seems to be signed in, so not opening account fragment");
+                model.getCurrentAccountFromModel().equals(user.getUid());
+
+            } catch (Exception e) {
+                System.out.println("no current account in model, so opening account fragment");
+
+                openAccountFragment();
+
+            }
+
+
+        }   //Not logged in
+            else {
+
+            System.out.println("account info not reached, so opening account fragment");
+
+            openAccountFragment();
+
+            }
+
+
+
+
+
+
+
+
+
 
     }
 
@@ -291,9 +282,77 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-
     }
 
+    public void openAccountFragment() {
+        if (!ACCOUNT_FRAG_ON) {
+            ACCOUNT_FRAG_ON = true;
+            weatherBoxView1.removeAllViews();
+            weatherBoxView2.removeAllViews();
+            weatherBoxView3.removeAllViews();
+            weatherSearchBar.setVisibility(android.view.View.INVISIBLE);
+            enterWeatherButton.setVisibility(android.view.View.INVISIBLE);
+            addButton_1.setVisibility(android.view.View.INVISIBLE);
+            addButton_2.setVisibility(android.view.View.INVISIBLE);
+            addButton_3.setVisibility(android.view.View.INVISIBLE);
+            newWeatherBoxButton_1.setVisibility(android.view.View.INVISIBLE);
+            newWeatherBoxButton_2.setVisibility(android.view.View.INVISIBLE);
+            newWeatherBoxButton_3.setVisibility(android.view.View.INVISIBLE);
+
+
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            transaction.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
+            transaction.setReorderingAllowed(true);
+            transaction.add(R.id.parentLayout, AccountFragment.class, null).commit();
+
+
+
+        }
+    }
+
+    public void closeAccountFragment() {
+        if (ACCOUNT_FRAG_ON) {
+            ACCOUNT_FRAG_ON = false;
+            weatherBox1.generateWeatherBox();
+            weatherBox2.generateWeatherBox();
+            weatherBox3.generateWeatherBox();
+            weatherSearchBar.setVisibility(android.view.View.VISIBLE);
+            enterWeatherButton.setVisibility(android.view.View.VISIBLE);
+            addButton_1.setVisibility(android.view.View.VISIBLE);
+            addButton_2.setVisibility(android.view.View.VISIBLE);
+            addButton_3.setVisibility(android.view.View.VISIBLE);
+            newWeatherBoxButton_1.setVisibility(android.view.View.VISIBLE);
+            newWeatherBoxButton_2.setVisibility(android.view.View.VISIBLE);
+            newWeatherBoxButton_3.setVisibility(android.view.View.VISIBLE);
+
+
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            transaction.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
+            transaction.addToBackStack(null);
+            transaction.remove(fragmentManager.findFragmentById(R.id.parentLayout)).commit();
+        }
+    }
+
+
+    //Sometimes the views show through on the accountfragment.
+    //This will check to make sure the weather views are not visible.
+    public void checkForBugsWithView() {
+        if (ACCOUNT_FRAG_ON) {
+            weatherBoxView1.removeAllViews();
+            weatherBoxView2.removeAllViews();
+            weatherBoxView3.removeAllViews();
+            weatherSearchBar.setVisibility(android.view.View.INVISIBLE);
+            enterWeatherButton.setVisibility(android.view.View.INVISIBLE);
+            addButton_1.setVisibility(android.view.View.INVISIBLE);
+            addButton_2.setVisibility(android.view.View.INVISIBLE);
+            addButton_3.setVisibility(android.view.View.INVISIBLE);
+            newWeatherBoxButton_1.setVisibility(android.view.View.INVISIBLE);
+            newWeatherBoxButton_2.setVisibility(android.view.View.INVISIBLE);
+            newWeatherBoxButton_3.setVisibility(android.view.View.INVISIBLE);
+        }
+    }
 
 
 

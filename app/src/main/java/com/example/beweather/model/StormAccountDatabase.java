@@ -16,7 +16,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 
-@Database(entities = {StormAccount.class}, version = 2, exportSchema = false)
+@Database(entities = {StormAccount.class}, version = 3, exportSchema = false)
 public abstract class StormAccountDatabase extends RoomDatabase{
 
     private static volatile StormAccountDatabase INSTANCE;

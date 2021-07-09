@@ -6,6 +6,8 @@ import androidx.lifecycle.LiveData;
 
 import com.example.beweather.accounts.StormAccount;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 
 public class StormRepository {
@@ -27,18 +29,15 @@ public class StormRepository {
 
 
     public void insert(StormAccount stormAccount) {
-        if (stormAccount.getFirebaseId() == null) {
+        StormAccountDatabase.databaseWriteExecutor.execute(() -> {
+            accountDao.insert(stormAccount);
+        });
 
-        } else {
-            StormAccountDatabase.databaseWriteExecutor.execute(() -> {
-                accountDao.insert(stormAccount);
-            });
-        }
 
     }
 
-    public LiveData<StormAccount> getAccount(String firebaseId) {
-        return accountDao.getAccount(firebaseId);
+    public LiveData<StormAccount> getAccount(int localId) {
+        return accountDao.getAccount(localId);
 
     }
 
@@ -46,6 +45,13 @@ public class StormRepository {
         StormAccountDatabase.databaseWriteExecutor.execute(() -> {
             accountDao.update(stormAccount);
         });
+    }
+
+    public void deleteAccount(StormAccount stormAccount) {
+        StormAccountDatabase.databaseWriteExecutor.execute(() -> {
+            accountDao.delete(stormAccount);
+        });
+
     }
 
 }
