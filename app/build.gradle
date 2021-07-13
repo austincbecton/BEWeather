@@ -26,9 +26,13 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 dependencies {
+    implementation 'com.google.android.gms:play-services-maps:17.0.1'
     def room_version = "2.3.0"
 
     implementation "androidx.room:room-runtime:$room_version"

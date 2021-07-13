@@ -93,11 +93,6 @@ public class AccountFragment extends Fragment {
 
 
 
-
-
-
-
-
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_account, container, false);
 
@@ -110,8 +105,6 @@ public class AccountFragment extends Fragment {
 
         title_my_account_name = view.findViewById(R.id.title_my_account_name);
         title_my_account_level = view.findViewById(R.id.title_my_account_level);
-
-
 
 
 
@@ -150,16 +143,8 @@ public class AccountFragment extends Fragment {
 
                     try {
 
-                        System.out.println("CURRENT USER IS " + user.getUid());
-                        System.out.println("CURRENT USER IS (IN MODEL): " + currentAccountId);
-                        thisAccount = new StormAccount();
-                        thisAccount.setFirebaseId(user.getUid());
-                        thisAccount.setNickname(user.getDisplayName());
-                        thisAccount.setMembership("Basic Member");
-
                         title_my_account_name.setText(thisAccount.getNickname());
                         title_my_account_level.setText(thisAccount.getMembership());
-
 
 
                     }catch (Exception e) {
@@ -169,12 +154,7 @@ public class AccountFragment extends Fragment {
                 });
 
 
-
-
-
-
             }
-
 
         };
 
@@ -183,15 +163,24 @@ public class AccountFragment extends Fragment {
 
 
 
+
+
         NavigationView accountOptions = view.findViewById(R.id.account_navigation_menu);
         accountOptions.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull  MenuItem item) {
                 if (item.getTitle().toString().equals("delete account")) {
-                    System.out.println("Account to delete: " + user.getUid());
-                    System.out.println("Account to delete: " + thisAccount.getFirebaseId());
-                    user.delete();
-                    model.deleteAccount(thisAccount);
+                    try {
+                        System.out.println("Account to delete: " + user.getUid());
+                        user.delete();
+                        StormAccount accountToBeDeleted = new StormAccount();
+                        accountToBeDeleted.setFirebaseId(model.getCurrentAccountFromModel());
+                        System.out.println("Account to delete: " + accountToBeDeleted.getFirebaseId());
+                        model.deleteAccount(accountToBeDeleted);
+                    } catch (Exception e) {
+                        System.out.println("Error deleting this account");
+                    }
+
                 }
                 else if (item.getTitle().toString().equals("logout")) {
                     logOutFirebase();
@@ -223,8 +212,10 @@ public class AccountFragment extends Fragment {
         if (result.getResultCode() == Activity.RESULT_OK) {
 
             // Successfully signed in
-            model.setCurrentAccount(FirebaseAuth.getInstance().getUid());
-            user = FirebaseAuth.getInstance().getCurrentUser();
+            //model.setCurrentAccount(FirebaseAuth.getInstance().getUid());
+            System.out.println("FIREBASE CHECKING: " + FirebaseAuth.getInstance().getUid());
+            model.setCurrentAccount("AUSTY");
+
             StormAccount account = new StormAccount();
             account.setFirebaseId(FirebaseAuth.getInstance().getUid());
             try {account.setNickname(user.getDisplayName());} catch (Exception e) {System.out.println("Error getting user.getDisplayName in acct frag");}

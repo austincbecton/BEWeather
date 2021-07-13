@@ -13,6 +13,7 @@ import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.view.GestureDetectorCompat;
 
+import com.example.beweather.weatherdata.WeatherImageProvider;
 import com.example.beweather.weatherdata.WeatherReport;
 
 
@@ -58,6 +59,7 @@ public class WeatherBoxDetailsView extends CardView {
         setPreventCornerOverlap(true);
         setRadius(50);
         setElevation(10);
+
 
     }
 
@@ -117,7 +119,31 @@ public class WeatherBoxDetailsView extends CardView {
         return findViewById(R.id.relativeLayoutInCardView3_detailsView);
     }
 
+    public void hideStandardView() {
+        try {
+            getWeatherIcon().setVisibility(View.INVISIBLE);
+            getWeatherViews_temperature().setVisibility(View.INVISIBLE);
+            getWeatherViews_location().setVisibility(View.INVISIBLE);
+        } catch (Exception e) {
+            System.out.println("Error hiding standard view items");
+        }
+
+    }
 
 
+    public void hideDetailsView() {
+        try {
+
+            getWeatherViews_cityName().setVisibility(View.INVISIBLE);
+            getWeatherViews_humidity().setVisibility(View.INVISIBLE);
+            getWeatherViews_tonight().setVisibility(View.INVISIBLE);
+            getWeatherViews_conditions().setVisibility(View.INVISIBLE);
+        } catch (Exception e) {
+            System.out.println("Error hiding detail view items.");
+        }
+
+
+
+    }
 
 }

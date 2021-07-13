@@ -10,4 +10,5 @@
     <string name="my_account">My Account</string>
     <string name="go_premium">Go Premium</string>
     <string name="sorry_coming_soon">We\'re sorry, this feature is coming soon.</string>
+    <string name="title_activity_maps">Map</string>
 </resources>

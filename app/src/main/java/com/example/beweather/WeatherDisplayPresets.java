@@ -11,11 +11,12 @@ import android.widget.Button;
 import android.widget.ImageView;
 import androidx.cardview.widget.CardView;
 
+import com.example.beweather.weatherdata.WeatherReport;
 
 
 public class WeatherDisplayPresets  {
 
-    private CardView cardView;
+    private WeatherBoxDetailsView cardView;
     private ObjectAnimator objectAnimator;
     private Button newWeatherBoxButton;
     private ImageView addButton;
@@ -26,8 +27,7 @@ public class WeatherDisplayPresets  {
 
 
     @SuppressLint("ClickableViewAccessibility")
-    public WeatherDisplayPresets(Context context, CardView cardView, Button newWeatherBoxButton, ImageView addButtonImageView) {
-
+    public WeatherDisplayPresets(Context context, WeatherBoxDetailsView cardView, Button newWeatherBoxButton, ImageView addButtonImageView) {
         this.cardView = cardView;
         this.newWeatherBoxButton = newWeatherBoxButton;
         this.addButton = addButtonImageView;
@@ -53,7 +53,9 @@ public class WeatherDisplayPresets  {
         cardView.postDelayed(new Runnable() {
             @Override
             public void run() {
+
                 cardView.setVisibility(android.view.View.INVISIBLE);
+                cardView.removeAllViews();
             }
         }, 1000);
 
@@ -95,7 +97,8 @@ public class WeatherDisplayPresets  {
 
 
 
-    public void newWeatherBox() {
+    public void newWeatherBox(WeatherReport newReport) {
+
 
         //Animatino for new box appearing.
         Animation appear = new AlphaAnimation(0.f, 1.f);
@@ -110,9 +113,11 @@ public class WeatherDisplayPresets  {
 
             @Override
             public void run() {
+                cardView.setX(55);
+
                 newWeatherBoxButton.setVisibility(View.INVISIBLE);
                 addButton.setVisibility(View.INVISIBLE);
-                cardView.setX(55);
+
                 cardView.startAnimation(appear);
             }
         }, 500);
@@ -125,9 +130,11 @@ public class WeatherDisplayPresets  {
 
                 cardView.setVisibility(View.VISIBLE);
             }
-        }, 750);
+        }, 1500);
 
 
+        cardView.getWeatherViews_location().setText(newReport.getLocationName_city());
+        cardView.getWeatherViews_temperature().setText(newReport.getTemperature());
         //Set up gesture detector
 
     }

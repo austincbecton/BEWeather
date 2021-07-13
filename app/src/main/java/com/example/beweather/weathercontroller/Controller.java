@@ -201,6 +201,9 @@ public class Controller  {
                         System.out.println(skyCondition);
                         System.out.println(newReport.getHumidity());
                         vmodel.addWeatherReport(newReport, context);
+                        System.out.println("Checking vmodel: " +
+                                vmodel.getRecentReport().getLocationName_city() +
+                                " is set as current city");
 
                     }
                 }, error -> System.out.println("ERROR GETTING WEATHER"));

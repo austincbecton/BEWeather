@@ -17,7 +17,7 @@ public class WeatherBoxGestureListener extends GestureDetector.SimpleOnGestureLi
 
     @Override
     public void onLongPress(MotionEvent e) {
-        weatherBox.switchToWeatherDetails();
+        weatherBox.longPressChangeViewType();
         weatherBox.triggerAd();
         super.onLongPress(e);
     }
@@ -31,7 +31,7 @@ public class WeatherBoxGestureListener extends GestureDetector.SimpleOnGestureLi
     @Override
     public boolean onFling(MotionEvent event1, MotionEvent event2,
                            float velocityX, float velocityY) {
-        weatherBox.exitWeatherBox();
+        weatherBox.flingWeatherBox();
         Log.d(DEBUG_TAG, "onFling: " + event1.toString() + event2.toString());
         return true;
     }

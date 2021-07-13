@@ -31,7 +31,6 @@ public class WebViewModel extends ViewModel {
     public SharedPreferences sharedPref;
     public static String GLOBAL_SHARED_PREFERENCES = "global_shared_preferences";
     private String CURRENT_ACCOUNT = "current_account";
-
     private static WebViewModel thisInstance;
     private StormRepository stormRepository;
 
@@ -69,6 +68,7 @@ public class WebViewModel extends ViewModel {
         recentWeatherSearch_humidity.setValue(report.getHumidity());
         recentWeatherSearch_skyConditions.setValue(report.getSkyCondition());
         recentWeatherSearch_temperature.setValue(report.getTemperature());
+
 
         //City name must be last because our observer will watch for changes here,
         //so we need to alter other elements before this one to make sure it's complete.
