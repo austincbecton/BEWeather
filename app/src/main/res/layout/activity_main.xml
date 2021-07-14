@@ -26,7 +26,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.example.beweather.WeatherBoxDetailsView
+    <com.be.beweather.WeatherBoxDetailsView
         android:id="@+id/weatherBoxView1"
         android:layout_width="wrap_content"
         android:layout_height="150dp"
@@ -57,7 +57,7 @@
         app:layout_constraintTop_toTopOf="@+id/weatherBoxView1" />
 
 
-    <com.example.beweather.WeatherBoxDetailsView
+    <com.be.beweather.WeatherBoxDetailsView
         android:id="@+id/weatherBoxView2"
         android:layout_width="wrap_content"
         android:layout_height="150dp"
@@ -71,7 +71,7 @@
         app:layout_constraintTop_toBottomOf="@+id/weatherBoxView1">
 
 
-    </com.example.beweather.WeatherBoxDetailsView>
+    </com.be.beweather.WeatherBoxDetailsView>
 
 
     <Button
@@ -91,7 +91,7 @@
         app:layout_constraintTop_toTopOf="@+id/weatherBoxView2" />
 
 
-    <com.example.beweather.WeatherBoxDetailsView
+    <com.be.beweather.WeatherBoxDetailsView
         android:id="@+id/weatherBoxView3"
         android:layout_width="wrap_content"
         android:layout_height="150dp"
@@ -105,7 +105,7 @@
         app:layout_constraintTop_toBottomOf="@+id/weatherBoxView2">
 
 
-    </com.example.beweather.WeatherBoxDetailsView>
+    </com.be.beweather.WeatherBoxDetailsView>
 
     <Button
         android:id="@+id/newWeatherBoxButton3"
