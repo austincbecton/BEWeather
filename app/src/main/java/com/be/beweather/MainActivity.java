@@ -26,6 +26,7 @@ import com.be.beweather.accounts.AccountFragment;
 import com.be.beweather.accounts.AccountManager;
 import com.be.beweather.model.WebViewModel;
 import com.be.beweather.weathercontroller.Controller;
+
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
@@ -109,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
             controller.submitRequest(location, model);
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(View.getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
-            refreshWeatherBoxes();
+            //refreshWeatherBoxes();
         });
 
         //The views/layouts that we'll pass to WeatherBox objects.
@@ -308,7 +309,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
+/*
 
     public void refreshWeatherBoxes() {
         String wBoxId_1;
@@ -333,6 +334,8 @@ public class MainActivity extends AppCompatActivity {
         weatherBox2 = new WeatherBox(this, this, controller, model, weatherSearchBar, weatherBoxView2, newWeatherBoxButton_2, addButton_2, wBoxId_2);
         weatherBox3 = new WeatherBox(this, this, controller, model, weatherSearchBar, weatherBoxView3, newWeatherBoxButton_3, addButton_3, wBoxId_3);
     }
+
+ */
 
 
 }

@@ -69,7 +69,9 @@ public class WeatherImageProvider {
             return R.drawable.card_background_rain;
         } else if (backgroundType.equals("wind")) {
             return R.drawable.card_background_cloudy;
-        } else if (backgroundType.equals("cloud") || iconType.equals("cloudy")) {
+        } else if (backgroundType.equals("cloud")) {
+            return R.drawable.card_background_cloudy;
+        } else if (backgroundType.equals("cloudy")) {
             return R.drawable.card_background_cloudy;
         } else if (backgroundType.equals("partlycloudy")) {
             return R.drawable.card_background_cloudy;

@@ -1,4 +1,4 @@
-package com.example.beweather;
+package com.be.beweather;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -9,12 +9,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.lifecycle.Observer;
-
-import com.example.beweather.model.WebViewModel;
-import com.example.beweather.weathercontroller.Controller;
-import com.example.beweather.weatherdata.WeatherImageProvider;
-import com.example.beweather.weatherdata.WeatherReport;
-
+import com.be.beweather.MainActivity;
+import com.be.beweather.WeatherBoxDetailsView;
+import com.be.beweather.WeatherDisplayPresets;
+import com.be.beweather.model.WebViewModel;
+import com.be.beweather.weathercontroller.Controller;
+import com.be.beweather.weatherdata.WeatherImageProvider;
+import com.be.beweather.weatherdata.WeatherReport;
 import java.util.Random;
 
 public class WeatherBox {
@@ -74,8 +75,11 @@ public class WeatherBox {
 
             //this variable stores this box's weather data, which the views will extract
             this.thisWeatherBoxWeatherReport = new WeatherReport(sharedPref.getString(TAG_location, "empty"), "");
+            this.thisWeatherBoxWeatherReport.updateWeatherReport("", "",
+                    "", "", "", "", "", "");
 
             //See if we currently have a report set up
+            //checks for 'empty' because we previously set it to empty if sharedpref returns nothing
             if (this.thisWeatherBoxWeatherReport.getLocationName_city().equals("empty")) {
                 this.thisWeatherBoxWeatherReport = model.getRecentReport();
                 if (this.thisWeatherBoxWeatherReport.getLocationName_city() == null) {
@@ -150,9 +154,15 @@ public class WeatherBox {
             //We'll check and make sure this box has been properly updated. Since we set "" as
             //humidity by default, we know if this box has been updated. If it equals "", we'll submit
             //a request, and this wbox's observer will update the box.
-            if (thisWeatherBoxWeatherReport.getHumidity().equals("")) {
-                controller.submitRequest(thisWeatherBoxWeatherReport.getLocationName_city(), model);
+
+            try {
+                if (thisWeatherBoxWeatherReport.getHumidity().equals("")) {
+                    controller.submitRequest(thisWeatherBoxWeatherReport.getLocationName_city(), model);
+                }
+            } catch (Exception e) {
+                System.out.println("WeatherBox: thisWeatherReport may contain null data");
             }
+
 
         }
 
@@ -183,6 +193,7 @@ public class WeatherBox {
                         System.out.println("Error hiding standard or building detail views.");
                     }
 
+
                     try {
                         //setting data to each view
                         weatherBoxDetailsView.getWeatherViews_cityName().setText(
@@ -201,12 +212,15 @@ public class WeatherBox {
                     } catch (Exception e) {
                         System.out.println("Error while setting details view: either getting" +
                                 "details from report or getting views");
+
                     }
 
                     try {
                         WeatherImageProvider weatherImageProvider = new WeatherImageProvider();
-                        Integer drawableId = weatherImageProvider.getWeatherIconId(thisWeatherBoxWeatherReport);
-                        weatherBoxDetailsView.getWeatherIcon().setBackgroundResource(drawableId);
+                        Integer backgroundId = weatherImageProvider.getWeatherBackgroundId(thisWeatherBoxWeatherReport);
+                        weatherBoxDetailsView.getDetailsViewLayoutBackground().setBackgroundResource(backgroundId);
+
+
                     } catch (Exception e) {
                         System.out.println("Error getting background image in detail view.");
                     }
@@ -393,6 +407,8 @@ public class WeatherBox {
         });
 
     }
+
+
 
 
 

@@ -3,6 +3,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -19,6 +20,7 @@ public class WebViewModel extends ViewModel {
     private MutableLiveData<String> recentWeatherSearch_humidity;
     private MutableLiveData<String> recentWeatherSearch_skyConditions;
     private MutableLiveData<String> recentWeatherSearch_countryName;
+    private MutableLiveData<String> recentWeatherSearch_tonight;
     public MutableLiveData<String> currentAccount;
 
 
@@ -36,6 +38,7 @@ public class WebViewModel extends ViewModel {
         this.recentWeatherSearch_humidity = new MutableLiveData<>();
         this.recentWeatherSearch_skyConditions = new MutableLiveData<>();
         this.recentWeatherSearch_temperature = new MutableLiveData<>();
+        this.recentWeatherSearch_tonight = new MutableLiveData<>();
         this.currentAccount = new MutableLiveData<>();
         this.sharedPref = context.getSharedPreferences(GLOBAL_SHARED_PREFERENCES,
                                                                     Context.MODE_PRIVATE);
@@ -62,6 +65,7 @@ public class WebViewModel extends ViewModel {
         recentWeatherSearch_humidity.setValue(report.getHumidity());
         recentWeatherSearch_skyConditions.setValue(report.getSkyCondition());
         recentWeatherSearch_temperature.setValue(report.getTemperature());
+        recentWeatherSearch_tonight.setValue(report.getTonight());
 
 
         //City name must be last because our observer will watch for changes here,
@@ -73,6 +77,7 @@ public class WebViewModel extends ViewModel {
         System.out.println(recentWeatherSearch_temperature.getValue());
         System.out.println(recentWeatherSearch_skyConditions.getValue());
         System.out.println(recentWeatherSearch_humidity.getValue());
+        System.out.println(recentWeatherSearch_tonight.getValue());
 
     }
 
@@ -83,7 +88,7 @@ public class WebViewModel extends ViewModel {
         dummy.updateWeatherReport("", recentWeatherSearch_temperature.getValue(),
                 recentWeatherSearch_skyConditions.getValue(),
                 recentWeatherSearch_humidity.getValue(), "", "", "",
-                "");
+                recentWeatherSearch_tonight.getValue());
         return dummy;
     }
 
@@ -93,6 +98,8 @@ public class WebViewModel extends ViewModel {
         return recentWeatherSearch_location;
     }
 
+
+    /*
     private void setDefaultWeather() {
         recentWeatherSearch_location.setValue("SAMPLE");
         recentWeatherSearch_countryName.setValue("..");
@@ -100,6 +107,8 @@ public class WebViewModel extends ViewModel {
         recentWeatherSearch_skyConditions.setValue("..");
         recentWeatherSearch_temperature.setValue("..");
     }
+
+     */
 
 
     public void setCurrentAccount(String firebaseId) {

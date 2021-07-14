@@ -129,7 +129,7 @@ public class WeatherDisplayPresets  {
 
                 cardView.setVisibility(View.VISIBLE);
             }
-        }, 1500);
+        }, 2000);
 
 
         cardView.getWeatherViews_location().setText(newReport.getLocationName_city());
