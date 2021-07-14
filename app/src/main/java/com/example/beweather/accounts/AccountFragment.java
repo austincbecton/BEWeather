@@ -42,6 +42,7 @@ import java.util.concurrent.Executors;
 
 
 public class AccountFragment extends Fragment {
+
     WebViewModel model;
     FirebaseUser user;
     StormAccount thisAccount;
@@ -81,7 +82,6 @@ public class AccountFragment extends Fragment {
 
         model = WebViewModel.getWebViewModel(getContext(), getActivity());
         user = FirebaseAuth.getInstance().getCurrentUser();
-
 
 
     }

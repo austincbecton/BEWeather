@@ -7,6 +7,8 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.GestureDetectorCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Observer;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -107,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
             controller.submitRequest(location, model);
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(View.getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
-
+            refreshWeatherBoxes();
         });
 
         //The views/layouts that we'll pass to WeatherBox objects.
@@ -306,6 +308,31 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+
+    public void refreshWeatherBoxes() {
+        String wBoxId_1;
+        String wBoxId_2;
+        String wBoxId_3;
+
+        try {
+
+            wBoxId_1 = "wBox1"+model.getCurrentAccountFromModel();
+            wBoxId_2 = "wBox2"+model.getCurrentAccountFromModel();
+            wBoxId_3 = "wBox3"+model.getCurrentAccountFromModel();
+
+        } catch (Exception e) {
+
+            wBoxId_1 = "wBox1"+"temporary";
+            wBoxId_2 = "wBox2"+"temporary";
+            wBoxId_3 = "wBox3"+"temporary";
+        }
+
+
+        weatherBox1 = new WeatherBox(this, this, controller, model, weatherSearchBar, weatherBoxView1, newWeatherBoxButton_1, addButton_1, wBoxId_1);
+        weatherBox2 = new WeatherBox(this, this, controller, model, weatherSearchBar, weatherBoxView2, newWeatherBoxButton_2, addButton_2, wBoxId_2);
+        weatherBox3 = new WeatherBox(this, this, controller, model, weatherSearchBar, weatherBoxView3, newWeatherBoxButton_3, addButton_3, wBoxId_3);
+    }
 
 
 }

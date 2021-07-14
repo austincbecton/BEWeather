@@ -93,6 +93,12 @@ public class WebViewModel extends ViewModel {
         return dummy;
     }
 
+    //Useful for a WeatherBox to check if current report is relevant to its own data
+    //By using observers, WeatherBox will be able to update itself as new data comes in
+    public LiveData<String> getRecentReport_location() {
+        return recentWeatherSearch_location;
+    }
+
     private void setDefaultWeather() {
         recentWeatherSearch_location.setValue("SAMPLE");
         recentWeatherSearch_countryName.setValue("..");
@@ -117,11 +123,7 @@ public class WebViewModel extends ViewModel {
 
     public void saveAccountInStormDatabase(StormAccount stormAccount) {
 
-
-
         stormRepository.insert(stormAccount);
-
-
 
     }
 
@@ -134,7 +136,6 @@ public class WebViewModel extends ViewModel {
     }
 
     public void deleteAccount(StormAccount stormAccount) {
-
         stormRepository.deleteAccount(stormAccount);
     }
 
