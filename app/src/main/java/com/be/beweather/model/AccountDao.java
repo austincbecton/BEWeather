@@ -33,7 +33,7 @@ public interface AccountDao {
     LiveData<List<StormAccount>> getAll() ;
 
     @Query ("SELECT * FROM stormAccounts_table WHERE firebaseId = :id")
-    LiveData<StormAccount> getAccount(int id);
+    LiveData<StormAccount> getAccount(String id);
 
     @Query("SELECT * FROM stormAccounts_table ")
     List<StormAccount> getAll_nonLiveData();

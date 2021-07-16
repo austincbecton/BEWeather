@@ -34,7 +34,7 @@ public class StormRepository {
 
     }
 
-    public LiveData<StormAccount> getAccount(int localId) {
+    public LiveData<StormAccount> getAccount(String localId) {
         return accountDao.getAccount(localId);
 
     }

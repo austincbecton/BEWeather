@@ -94,15 +94,18 @@ public class AccountFragment extends Fragment {
 
     }
 
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+
+        //Set up views
         title_my_account_name = view.findViewById(R.id.title_my_account_name);
         title_my_account_level = view.findViewById(R.id.title_my_account_level);
 
 
-
+        //Get Firebase account
         user = FirebaseAuth.getInstance().getCurrentUser();
         System.out.println("Current user is " + model.getCurrentAccountFromModel());
 
@@ -129,6 +132,8 @@ public class AccountFragment extends Fragment {
         }
 
 
+
+        //Observe updates to current user
         final Observer<String> currentUserObserver = new Observer<String>() {
 
             @Override
@@ -138,6 +143,9 @@ public class AccountFragment extends Fragment {
 
                     try {
 
+                        thisAccount = model.getAccountFromDatabase(user.getUid());
+                        System.out.println("This account was set in on changed method to: "+
+                                thisAccount.getFirebaseId()+thisAccount.getNickname());
                         title_my_account_name.setText(thisAccount.getNickname());
                         title_my_account_level.setText(thisAccount.getMembership());
 
@@ -186,10 +194,6 @@ public class AccountFragment extends Fragment {
 
 
 
-
-
-
-
     }
 
     private final ActivityResultLauncher<Intent> signInLauncher = registerForActivityResult(
@@ -206,10 +210,7 @@ public class AccountFragment extends Fragment {
         IdpResponse response = result.getIdpResponse();
         if (result.getResultCode() == Activity.RESULT_OK) {
 
-            // Successfully signed in
-            //model.setCurrentAccount(FirebaseAuth.getInstance().getUid());
-            System.out.println("FIREBASE CHECKING: " + FirebaseAuth.getInstance().getUid());
-            model.setCurrentAccount("AUSTY");
+
 
             StormAccount account = new StormAccount();
             account.setFirebaseId(FirebaseAuth.getInstance().getUid());
@@ -226,7 +227,7 @@ public class AccountFragment extends Fragment {
             System.out.println(account.getNickname());
             System.out.println(model.getCurrentAccountFromModel());
 
-            // ...
+
         } else {
             System.out.println("DID NOT SET MODEL");
 
@@ -271,3 +272,12 @@ public class AccountFragment extends Fragment {
 
 
 }
+
+/*
+
+
+
+
+
+
+ */

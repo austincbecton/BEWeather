@@ -130,7 +130,7 @@ public class WebViewModel extends ViewModel {
 
     }
 
-    public StormAccount getAccountFromDatabase(int localId) {
+    public StormAccount getAccountFromDatabase(String localId) {
         return stormRepository.getAccount(localId).getValue();
     }
 
