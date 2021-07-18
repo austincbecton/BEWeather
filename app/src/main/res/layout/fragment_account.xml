@@ -5,9 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/clear"
+    android:id="@+id/account_fragment_root"
     tools:context=".accounts.AccountFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/account_fragment_subroot"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="50dp"
@@ -55,9 +57,11 @@
                     android:textSize="16sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.106"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/title_my_account"
-                    app:layout_constraintVertical_bias="0.114"
-                    tools:layout_editor_absoluteX="16dp" />
+                    app:layout_constraintVertical_bias="0.117" />
 
                 <TextView
                     android:id="@+id/title_my_account_level"

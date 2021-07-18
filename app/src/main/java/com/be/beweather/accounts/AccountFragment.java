@@ -6,20 +6,29 @@ import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentContainerView;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.be.beweather.R;
 import com.be.beweather.model.WebViewModel;
+import com.be.beweather.weatherdata.GeneralLoadingScreenFragment;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
 import com.firebase.ui.auth.IdpResponse;
@@ -32,6 +41,8 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -47,6 +58,7 @@ public class AccountFragment extends Fragment {
     private String mParam2;
     TextView title_my_account_name;
     TextView title_my_account_level;
+    private ViewGroup accountFragmentViews;
 
     private static final int NUMBER_OF_THREADS = 4;
     static final ExecutorService backgroundWriteExecutor =
@@ -70,34 +82,37 @@ public class AccountFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        /*
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
+         */
+
         model = WebViewModel.getWebViewModel(getContext(), getActivity());
         user = FirebaseAuth.getInstance().getCurrentUser();
-
 
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-
-
-
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_account, container, false);
-
-
     }
 
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+
+        getLayoutInflater().inflate(R.layout.general_loading_screen,
+                view.findViewById(R.id.account_fragment_root));
+
+        //This will set up rotation/animations for loading screen.
+        setLoadingScreen(view);
 
 
         //Set up views
@@ -109,6 +124,8 @@ public class AccountFragment extends Fragment {
         user = FirebaseAuth.getInstance().getCurrentUser();
         System.out.println("Current user is " + model.getCurrentAccountFromModel());
 
+
+        //If nobody is signed in...
         if (model.getCurrentAccountFromModel() != null) {
             if (model.getCurrentAccountFromModel().equals("") ||
                     model.getCurrentAccountFromModel().isEmpty() ||
@@ -116,7 +133,11 @@ public class AccountFragment extends Fragment {
 
                 logIn();
 
-            } else {
+
+            }
+            //Otherwise, if somebody is signed in, do nothing.
+            // If there's an issue with it, log in anyway.
+            else {
                 if (user != null) {
                     System.out.println("WERE IN" + user.getUid());
                     System.out.println(model.getCurrentAccountFromModel());
@@ -126,7 +147,10 @@ public class AccountFragment extends Fragment {
 
             }
 
-        } else {
+        }
+
+        //Preventative measure in case of errors.
+        else {
 
             logOutFirebase();
         }
@@ -146,8 +170,8 @@ public class AccountFragment extends Fragment {
                         thisAccount = model.getAccountFromDatabase(user.getUid());
                         System.out.println("This account was set in on changed method to: "+
                                 thisAccount.getFirebaseId()+thisAccount.getNickname());
-                        title_my_account_name.setText(thisAccount.getNickname());
-                        title_my_account_level.setText(thisAccount.getMembership());
+                        //title_my_account_name.setText(thisAccount.getNickname());
+                        //title_my_account_level.setText(thisAccount.getMembership());
 
 
                     }catch (Exception e) {
@@ -167,7 +191,8 @@ public class AccountFragment extends Fragment {
 
 
 
-
+       // View.inflate(getContext(), R.layout.fragment_account , view.findViewById(R.id.general_loading_screen_root));
+/*
         NavigationView accountOptions = view.findViewById(R.id.account_navigation_menu);
         accountOptions.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -192,6 +217,8 @@ public class AccountFragment extends Fragment {
             }
         });
 
+
+ */
 
 
     }
@@ -220,8 +247,8 @@ public class AccountFragment extends Fragment {
             }
             account.setMembership("basic");
             model.saveAccountInStormDatabase(account);
-            title_my_account_name.setText(account.getNickname());
-            title_my_account_level.setText(account.getMembership());
+            //title_my_account_name.setText(account.getNickname());
+            //title_my_account_level.setText(account.getMembership());
 
             model.setCurrentAccount(account.getFirebaseId());
             System.out.println(account.getNickname());
@@ -246,7 +273,6 @@ public class AccountFragment extends Fragment {
                     }
                 });
 
-
     }
 
     public void logIn() {
@@ -265,13 +291,41 @@ public class AccountFragment extends Fragment {
                 .build();
         signInLauncher.launch(signInIntent);
 
+    }
 
+
+    public void setLoadingScreen(View view) {
+
+        ImageView loadingIcon = view.findViewById(R.id.loadingIcon);
+        Animation rotateAnim = AnimationUtils.loadAnimation(getContext(), R.anim.loading_anim);
+        loadingIcon.startAnimation(rotateAnim);
+        boolean loggedIn = false;
+        if (model.getCurrentAccountFromModel() != null) {
+            if (!model.getCurrentAccountFromModel().isEmpty()) {
+                loggedIn = true;
+            }
+        }
+
+        Boolean finalLoggedIn = loggedIn;
+        loadingIcon.postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                if (!finalLoggedIn) {
+                    loadingIcon.startAnimation(rotateAnim);
+                    setLoadingScreen(view);
+                }
+            }
+        }, 5100);
     }
 
 
 
 
+
 }
+
+
 
 /*
 

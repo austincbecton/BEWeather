@@ -75,8 +75,8 @@ public class Controller  {
 
 
     public void submitRequest(String location, WebViewModel vmodel) {
+        //String weatherUrl = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/" + location + "?key=QZ2CJDXT7CYASXM6598KXSPDX";
         String weatherUrl = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/" + location + "?key=QZ2CJDXT7CYASXM6598KXSPDX";
-
         //URL below is free API testing
         //String weatherUrl = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/%22%20+%20location%20+%20%22?key=QZ2CJDXT7CYASXM6598KXSPDX";
 
