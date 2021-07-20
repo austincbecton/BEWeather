@@ -143,24 +143,12 @@ public class WebViewModel extends ViewModel {
     }
 
 
-    public ArrayList<StormAccount> getAllAccounts() {
-        ArrayList<StormAccount> allAccountsList = new ArrayList<>();
 
-        try {
-            allAccountsList.addAll(stormRepository.getAllAccounts().getValue());
-        }catch (Exception e) {
-            System.out.println("Error getting all accounts in the view model.");
-            StormAccount dummyAccount = new StormAccount();
-            dummyAccount.setMembership("dummyacct");
-            dummyAccount.setNickname("dummyacct");
-            dummyAccount.setFirebaseId("dummyacct");
-            stormRepository.insert(dummyAccount);
-        }
 
-        return allAccountsList;
+    public ArrayList<StormAccount> getAllAccounts_foruseOnBackgroundThread() {
 
+        return new ArrayList<>(stormRepository.getAllAccounts_nonLiveData());
     }
-
 
 
 

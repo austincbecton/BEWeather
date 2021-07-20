@@ -409,7 +409,44 @@ public class WeatherBox {
     }
 
 
+    public String getThisWBoxId() {
+        return thisWBoxId;
+    }
 
+    public void setThisWBoxId(String thisWBoxId) {
+        this.thisWBoxId = thisWBoxId;
+    }
+
+    public void refresh() {
+        //this variable stores this box's weather data, which the views will extract
+        this.thisWeatherBoxWeatherReport = new WeatherReport(sharedPref.getString(TAG_location, "empty"), "");
+        this.thisWeatherBoxWeatherReport.updateWeatherReport("", "",
+                "", "", "", "", "", "");
+
+        //See if we currently have a report set up
+        //checks for 'empty' because we previously set it to empty if sharedpref returns nothing
+        if (this.thisWeatherBoxWeatherReport.getLocationName_city().equals("empty")) {
+            this.thisWeatherBoxWeatherReport = model.getRecentReport();
+            if (this.thisWeatherBoxWeatherReport.getLocationName_city() == null) {
+                this.thisWeatherBoxWeatherReport = new WeatherReport("empty", "empty");
+            }
+
+            //set up observer
+            observeCurrentData();
+        } else {
+
+            //Otherwise, we'll submit a new request via volley to get the latest weather data.
+            controller.submitRequest(thisWeatherBoxWeatherReport.getLocationName_city(), model);
+            //Set up report as empty for now.
+            this.thisWeatherBoxWeatherReport = new WeatherReport(
+                    thisWeatherBoxWeatherReport.getLocationName_city(),
+                    thisWeatherBoxWeatherReport.getLocationName_country());
+
+            //avoid null pointers later on by creating empty data here.
+            this.thisWeatherBoxWeatherReport.updateWeatherReport(
+                    "", "", "", "", "",
+                    "", "", "");}
+    }
 
 
 

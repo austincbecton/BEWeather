@@ -1,6 +1,7 @@
 package com.be.beweather;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -24,6 +25,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import com.be.beweather.accounts.AccountFragment;
 import com.be.beweather.accounts.AccountManager;
+import com.be.beweather.accounts.StormAccount;
 import com.be.beweather.model.WebViewModel;
 import com.be.beweather.weathercontroller.Controller;
 
@@ -221,9 +223,6 @@ public class MainActivity extends AppCompatActivity {
 
 
             }
-
-
-            
 
 
     }

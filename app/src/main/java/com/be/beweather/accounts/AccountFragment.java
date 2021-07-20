@@ -16,6 +16,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -39,6 +40,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
@@ -52,30 +54,40 @@ public class AccountFragment extends Fragment {
     WebViewModel model;
     FirebaseUser user;
     StormAccount thisAccount;
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-    private String mParam1;
-    private String mParam2;
     TextView title_my_account_name;
     TextView title_my_account_level;
+    private ArrayList<StormAccount> allAccountsList;
     private ViewGroup accountFragmentViews;
-
     private static final int NUMBER_OF_THREADS = 4;
     static final ExecutorService backgroundWriteExecutor =
             Executors.newFixedThreadPool(NUMBER_OF_THREADS);
+    private static final String TAG = "AccountFragment";
+    private View inflatedView;
+
+
 
     public Button logoutButton;
+    /*
+       private static final String ARG_PARAM1 = "param1";
+       private static final String ARG_PARAM2 = "param2";
 
+       private String mParam1;
+       private String mParam2;
+
+        */
     public AccountFragment() {
         // Required empty public constructor
     }
 
     public static AccountFragment newInstance(String param1, String param2) {
         AccountFragment fragment = new AccountFragment();
+        /*
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
+
+         */
         return fragment;
     }
 
@@ -93,6 +105,9 @@ public class AccountFragment extends Fragment {
 
         model = WebViewModel.getWebViewModel(getContext(), getActivity());
         user = FirebaseAuth.getInstance().getCurrentUser();
+        backgroundWriteExecutor.execute(()->{
+            allAccountsList = model.getAllAccounts_foruseOnBackgroundThread();
+        });
 
     }
 
@@ -107,9 +122,10 @@ public class AccountFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
+        //Set up loading screen
         getLayoutInflater().inflate(R.layout.general_loading_screen,
                 view.findViewById(R.id.account_fragment_root));
+        inflatedView = view;
 
         //This will set up rotation/animations for loading screen.
         setLoadingScreen(view);
@@ -120,65 +136,58 @@ public class AccountFragment extends Fragment {
         title_my_account_level = view.findViewById(R.id.title_my_account_level);
 
 
+        /**
+         * MainActivity should have already checked model for current user.
+         * First method:     set up loading screen
+         * Second method:    check if user signed in now ***IN FIREBASE***
+         *                  if yes, update model
+         *                  if no, start login process + remove loading screen, then update textviews
+         * Third method:    remove loading screen + update textviews
+         */
+
+
         //Get Firebase account
         user = FirebaseAuth.getInstance().getCurrentUser();
         System.out.println("Current user is " + model.getCurrentAccountFromModel());
 
 
-        //If nobody is signed in...
-        if (model.getCurrentAccountFromModel() != null) {
-            if (model.getCurrentAccountFromModel().equals("") ||
-                    model.getCurrentAccountFromModel().isEmpty() ||
-                    model.getCurrentAccountFromModel().equals("123")) {
-
-                logIn();
-
-
+        //Check current sign in
+        try {
+            if (checkCurrentLogIn()) {
+                //stopLoadingScreen(view);
             }
-            //Otherwise, if somebody is signed in, do nothing.
-            // If there's an issue with it, log in anyway.
-            else {
-                if (user != null) {
-                    System.out.println("WERE IN" + user.getUid());
-                    System.out.println(model.getCurrentAccountFromModel());
-                } else {
-                    logIn();
-                }
-
-            }
-
-        }
-
-        //Preventative measure in case of errors.
-        else {
-
+        } catch (Exception e) {
+            Log.e(TAG, "Error checking current log in");
+            //In case of error, we'll just log out.
+            //stopLoadingScreen(view);
             logOutFirebase();
         }
 
 
-
-        //Observe updates to current user
+        //Observe gets updates from model.currentAccount, then updates the account info displayed
         final Observer<String> currentUserObserver = new Observer<String>() {
 
             @Override
             public void onChanged(@Nullable final String currentAccountId) {
 
-                backgroundWriteExecutor.execute(() -> {
+                System.out.println("onChanged called in AccountFragment");
+                //Update the current account being used.
+                for (StormAccount nextAccount : allAccountsList) {
+                    System.out.println("Accounts test: allAccountsList item: "+ nextAccount.getFirebaseId());
 
-                    try {
-
-                        thisAccount = model.getAccountFromDatabase(user.getUid());
-                        System.out.println("This account was set in on changed method to: "+
-                                thisAccount.getFirebaseId()+thisAccount.getNickname());
-                        //title_my_account_name.setText(thisAccount.getNickname());
-                        //title_my_account_level.setText(thisAccount.getMembership());
-
-
-                    }catch (Exception e) {
-                        System.out.println("Error in the onChanged method in AccountFragment");
+                    if (nextAccount.getFirebaseId().equals(currentAccountId)) {
+                        thisAccount = nextAccount;
                     }
+                }
 
-                });
+
+                try {
+                    title_my_account_name.setText(thisAccount.getNickname());
+                    title_my_account_level.setText(thisAccount.getMembership());
+
+                }catch (Exception e) {
+                    Log.e(TAG, "Error setting textviews due to null account");
+                }
 
 
             }
@@ -192,7 +201,7 @@ public class AccountFragment extends Fragment {
 
 
        // View.inflate(getContext(), R.layout.fragment_account , view.findViewById(R.id.general_loading_screen_root));
-/*
+
         NavigationView accountOptions = view.findViewById(R.id.account_navigation_menu);
         accountOptions.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -205,6 +214,8 @@ public class AccountFragment extends Fragment {
                         accountToBeDeleted.setFirebaseId(model.getCurrentAccountFromModel());
                         System.out.println("Account to delete: " + accountToBeDeleted.getFirebaseId());
                         model.deleteAccount(accountToBeDeleted);
+                        model.setCurrentAccount(null);
+                        logOutFirebase();
                     } catch (Exception e) {
                         System.out.println("Error deleting this account");
                     }
@@ -218,7 +229,7 @@ public class AccountFragment extends Fragment {
         });
 
 
- */
+
 
 
     }
@@ -238,27 +249,53 @@ public class AccountFragment extends Fragment {
         if (result.getResultCode() == Activity.RESULT_OK) {
 
 
-
-            StormAccount account = new StormAccount();
-            account.setFirebaseId(FirebaseAuth.getInstance().getUid());
-            try {account.setNickname(user.getDisplayName());} catch (Exception e) {System.out.println("Error getting user.getDisplayName in acct frag");}
-            if (account.getNickname() == null) {
-                account.setNickname("no name set");
+            //check if this account exists already
+            boolean foundAccount = false;
+            try {
+                for (StormAccount nextAccount : allAccountsList) {
+                    if (nextAccount.getFirebaseId().equals(user.getUid())) {
+                        model.setCurrentAccount(nextAccount.getFirebaseId());
+                        foundAccount = true;
+                        break;
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error, likely relted to user.getUid");
             }
-            account.setMembership("basic");
-            model.saveAccountInStormDatabase(account);
-            //title_my_account_name.setText(account.getNickname());
-            //title_my_account_level.setText(account.getMembership());
 
-            model.setCurrentAccount(account.getFirebaseId());
-            System.out.println(account.getNickname());
-            System.out.println(model.getCurrentAccountFromModel());
 
+            //if not, make a new one using firebaseAuth's ["user"] info
+            if (!foundAccount) {
+                //Use set up new account method so we can then save it in database and model
+                StormAccount newAccount = setUpNewAccount();
+                model.saveAccountInStormDatabase(newAccount);
+                model.setCurrentAccount(newAccount.getFirebaseId());
+                backgroundWriteExecutor.execute(()->{
+                    allAccountsList = model.getAllAccounts_foruseOnBackgroundThread();
+                });
+            }
+
+            System.out.println("End of onSignInResult. User is: " + model.getCurrentAccountFromModel());
 
         } else {
             System.out.println("DID NOT SET MODEL");
 
         }
+
+        try {model.setCurrentAccount(user.getUid());}
+        catch(Exception e) {
+            Log.e(TAG, "error getting user.getUid");
+            try {
+                model.setCurrentAccount(FirebaseAuth.getInstance().getUid());
+            }
+            catch(Exception e1) {
+                Log.e(TAG, "error getting user.getUid in second attempt");
+
+            }
+        }
+        stopLoadingScreen(inflatedView);
+
+
     }
 
 
@@ -269,6 +306,7 @@ public class AccountFragment extends Fragment {
                 .signOut(getContext())
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     public void onComplete(@NonNull Task<Void> task) {
+                        Log.i(TAG, "loggin in user: logOutFirebase");
                         logIn();
                     }
                 });
@@ -320,18 +358,53 @@ public class AccountFragment extends Fragment {
     }
 
 
+    private boolean checkCurrentLogIn() {
 
+
+        if (model.getCurrentAccountFromModel() != null) {
+            Log.i(TAG, "Current user acc to model: " + model.getCurrentAccountFromModel());
+            Log.i(TAG, "Current user acc to firebase user variable: "+user.getUid());
+
+            if (model.getCurrentAccountFromModel().equals(user.getUid())) {
+                //TODO: Update local account information with firebase
+                stopLoadingScreen(inflatedView);
+
+                return true;
+            } else {
+                Log.i(TAG, "loggin in user: checkCurrentLogIn method, else statement 1");
+                logIn();
+                return false;
+            }
+
+        } else {
+            Log.i(TAG, "loggin in user: checkCurrentLogIn method, else statement 2");
+            logIn();
+            return false;
+        }
+
+
+    }
+
+
+
+
+    private void stopLoadingScreen(View thisFragmentsView) {
+
+        thisFragmentsView.findViewById(R.id.general_loading_screen_root).setVisibility(View.INVISIBLE);
+
+    }
+
+    private StormAccount setUpNewAccount() {
+        StormAccount account = new StormAccount();
+        account.setFirebaseId(FirebaseAuth.getInstance().getUid());
+        try {account.setNickname(user.getDisplayName());} catch (Exception e) {System.out.println("Error getting user.getDisplayName in acct frag");}
+        if (account.getNickname() == null) {
+            account.setNickname("no name set");
+        }
+        account.setMembership("basic");
+        return account;
+    }
 
 
 }
 
-
-
-/*
-
-
-
-
-
-
- */

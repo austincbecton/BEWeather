@@ -14,15 +14,21 @@ public class StormRepository {
     private AccountDao accountDao;
     private LiveData<List<StormAccount>> allAccounts;
 
-
     public StormRepository(Application application) {
             StormAccountDatabase db = StormAccountDatabase.getDatabase(application);
             accountDao = db.accountDao();
             allAccounts = accountDao.getAll();
     }
 
+
+
     LiveData<List<StormAccount>> getAllAccounts() {
         return allAccounts;
+    }
+
+    List<StormAccount> getAllAccounts_nonLiveData() {
+        return accountDao.getAll_nonLiveData();
+
     }
 
 
@@ -30,7 +36,6 @@ public class StormRepository {
         StormAccountDatabase.databaseWriteExecutor.execute(() -> {
             accountDao.insert(stormAccount);
         });
-
 
     }
 
