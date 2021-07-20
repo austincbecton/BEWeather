@@ -69,6 +69,9 @@ public class WeatherDisplayPresets  {
                 addButton.setVisibility(View.VISIBLE);
                 addButton.startAnimation(appear);
 
+                cardView.setX(55);
+
+
             }
         }, 1000);
 
@@ -98,10 +101,10 @@ public class WeatherDisplayPresets  {
 
     public void newWeatherBox(WeatherReport newReport) {
 
-
-        //Animatino for new box appearing.
+        //Animation for new box appearing.
         Animation appear = new AlphaAnimation(0.f, 1.f);
         appear.setDuration(1500);
+
         //Animation to remove newWeatherBoxButton
         Animation fade = new AlphaAnimation(1.f, 0.f);
         fade.setDuration(500);
@@ -112,12 +115,12 @@ public class WeatherDisplayPresets  {
 
             @Override
             public void run() {
-                cardView.setX(55);
+                //cardView.setX(55);
 
                 newWeatherBoxButton.setVisibility(View.INVISIBLE);
                 addButton.setVisibility(View.INVISIBLE);
-
                 cardView.startAnimation(appear);
+
             }
         }, 500);
 
@@ -127,7 +130,7 @@ public class WeatherDisplayPresets  {
             @Override
             public void run() {
 
-                cardView.setVisibility(View.VISIBLE);
+                //cardView.setVisibility(View.VISIBLE);
             }
         }, 2000);
 

@@ -42,6 +42,7 @@ public class WeatherBox {
         public static final String MODE_DETAIL = "detail_weatherBoxView";
         public static final String MODE_INVISIBLE = "no_weatherBoxView";
         public static final String MODE_ENTER = "enter_weatherBoxView";
+        public static final String MODE_NEWWBOX_STANDARD = "newwbox_weatherBoxView";
 
     //constructor needs views added from the activity
         public WeatherBox(
@@ -332,8 +333,6 @@ public class WeatherBox {
                     weatherBoxDetailsView.getWeatherViews_temperature().setText(
                             thisWeatherBoxWeatherReport.getTemperature());
                     break;
-
-
 
                 default:
 
