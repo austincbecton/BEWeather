@@ -2,6 +2,7 @@ package com.be.beweather;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -42,6 +43,7 @@ public class WeatherBox {
         public static final String MODE_DETAIL = "detail_weatherBoxView";
         public static final String MODE_INVISIBLE = "no_weatherBoxView";
         public static final String MODE_ENTER = "enter_weatherBoxView";
+        private static final String TAG = "WeatherBox";
 
     //constructor needs views added from the activity
         public WeatherBox(
@@ -176,6 +178,9 @@ public class WeatherBox {
 
     }
 
+
+    //This is called by alternate_view methods and will select
+    // appropriate methods from WeatherDisplayPresets for setting views and visibility.
     public void setWeatherBoxDisplay(String mode) {
 
             switch (mode){
@@ -184,11 +189,21 @@ public class WeatherBox {
                     System.out.println("MODE_DETAIL SELECTED");
                     //remove standard weather views
                     try {
+
+
+                        weatherDisplayPresets.weatherViewVisibility_hideStandardShowDetails();
+/*
                         weatherBoxDetailsView.setVisibility(View.VISIBLE);
                         weatherBoxDetailsView.hideStandardView();
                         weatherBoxDetailsView.alterViewLayout_detailView(context);
+
+ */
+                        weatherDisplayPresets.weatherViewVisibility_hideAddWeatherButtons();
+                        /*
                         addWeatherBoxButton.setVisibility(View.INVISIBLE);
                         newWeatherBoxButton.setVisibility(View.INVISIBLE);
+                         */
+
                     } catch (Exception e) {
                         System.out.println("Error hiding standard or building detail views.");
                     }
@@ -234,25 +249,18 @@ public class WeatherBox {
                     try {
 
                         System.out.println("Mode_invisible being set.");
-                        weatherBoxDetailsView.setVisibility(View.INVISIBLE);
-                        weatherBoxDetailsView.hideDetailsView();
-                        weatherBoxDetailsView.hideStandardView();
-                        addWeatherBoxButton.setVisibility(View.INVISIBLE);
-                        newWeatherBoxButton.setVisibility(View.INVISIBLE);
-
+                        weatherDisplayPresets.weatherViewVisibilty_hideWeatherBox();
+                        weatherDisplayPresets.weatherViewVisibility_hideAddWeatherButtons();
 
                     }catch (Exception e) {
                         System.out.println("Error hiding weather views.");
                     }
                     break;
 
-
                 case MODE_STANDARD:
                     currentDisplayType = "standard";
                     //First, see if we currently have any saved locations for this wbox.
                     //This is important when box first instantiated upon startup in main activity
-
-
 
                     if (thisWeatherBoxWeatherReport.getLocationName_city() == null ||
                             thisWeatherBoxWeatherReport.getLocationName_city().equals("null") ||
@@ -260,61 +268,48 @@ public class WeatherBox {
                             thisWeatherBoxWeatherReport.getLocationName_city().equals("Unknown City"))
                     {
                         try {
+
                             System.out.println("MODE_STANDARD selected, but report is null.");
-                            weatherBoxDetailsView.setVisibility(View.INVISIBLE);
-                            try {weatherBoxDetailsView.hideDetailsView();
-                                weatherBoxDetailsView.hideStandardView();}
-                            catch (Exception e) {System.out.println("No views to close.");}
-                            addWeatherBoxButton.setVisibility(View.VISIBLE);
-                            newWeatherBoxButton.setVisibility(View.VISIBLE);
+                            weatherDisplayPresets.weatherViewVisibilty_hideWeatherBox();
+                            weatherDisplayPresets.weatherViewVisibility_showAddWeatherButtons();
 
                         } catch (Exception e) {
                             //
                         }
-
 
                     } else {
                         System.out.println("MODE_STANDARD selected, report is for: " +
                                 thisWeatherBoxWeatherReport.getLocationName_city());
 
                         //Remove add buttons visibility
-                        addWeatherBoxButton.setVisibility(View.INVISIBLE);
-                        newWeatherBoxButton.setVisibility(View.INVISIBLE);
+                        weatherDisplayPresets.weatherViewVisibility_hideAddWeatherButtons();
 
                         //inflate standard view layout, make sure views visible
-                        weatherBoxDetailsView.alterViewLayout_standardView(context);
-                        weatherBoxDetailsView.setVisibility(View.VISIBLE);
-                        weatherBoxDetailsView.getWeatherViews_location().setVisibility(View.VISIBLE);
-                        weatherBoxDetailsView.getWeatherViews_temperature().setVisibility(View.VISIBLE);
-                        weatherBoxDetailsView.getWeatherIcon().setVisibility(View.VISIBLE);
+                        weatherDisplayPresets.weatherViewVisibility_showStandardView();
 
                         //setting data to each view
-                        WeatherImageProvider weatherImageProvider = new WeatherImageProvider();
-                        Integer drawableId = weatherImageProvider.getWeatherIconId(thisWeatherBoxWeatherReport);
-                        Integer backgroundId = weatherImageProvider.getWeatherBackgroundId(thisWeatherBoxWeatherReport);
-                        weatherBoxDetailsView.getWeatherIcon().setBackgroundResource(drawableId);
-                        weatherBoxDetailsView.getStandardViewLayoutBackground().setBackgroundResource(backgroundId);
-                        weatherBoxDetailsView.getWeatherViews_location().setText(
-                                thisWeatherBoxWeatherReport.getLocationName_city());
-                        weatherBoxDetailsView.getWeatherViews_temperature().setText(
-                                thisWeatherBoxWeatherReport.getTemperature());
+                        weatherDisplayPresets.dataBinding_standardViewSetUp(thisWeatherBoxWeatherReport);
+
 
                     }
-
 
                     break;
                 case MODE_ENTER:
                     System.out.println("MODE_ENTER selected, report is for: " +
                             thisWeatherBoxWeatherReport.getLocationName_city());
-                    addWeatherBoxButton.setVisibility(View.INVISIBLE);
-                    newWeatherBoxButton.setVisibility(View.INVISIBLE);
 
+                    weatherDisplayPresets.weatherViewVisibility_hideAddWeatherButtons();
                     weatherBoxDetailsView.alterViewLayout_standardView(context);
-                    //weatherBoxDetailsView.setVisibility(View.VISIBLE);
-                    //weatherBoxDetailsView.getWeatherViews_location().setVisibility(View.VISIBLE);
-                    //weatherBoxDetailsView.getWeatherViews_temperature().setVisibility(View.VISIBLE);
-                    //weatherBoxDetailsView.getWeatherIcon().setVisibility(View.VISIBLE);
                     weatherDisplayPresets.newWeatherBox(thisWeatherBoxWeatherReport);
+
+                    try {
+                        weatherDisplayPresets.dataBinding_standardViewSetUp(thisWeatherBoxWeatherReport);
+                    } catch (Exception e) {
+                        Log.e(TAG, "MODE_ENTER: Error setting views for the weatherbox.");
+                    }
+
+                    /*
+
 
                     try {
                         WeatherImageProvider weatherImageProvider = new WeatherImageProvider();
@@ -331,6 +326,8 @@ public class WeatherBox {
                             thisWeatherBoxWeatherReport.getLocationName_city());
                     weatherBoxDetailsView.getWeatherViews_temperature().setText(
                             thisWeatherBoxWeatherReport.getTemperature());
+
+                            */
                     break;
 
 
@@ -344,6 +341,7 @@ public class WeatherBox {
     }
 
 
+    //called by gesture detector, this lets viewer swipe away/close the weatherbox
     public void flingWeatherBox(){
         currentDisplayType = "exited";
         weatherDisplayPresets.exitAnimation();

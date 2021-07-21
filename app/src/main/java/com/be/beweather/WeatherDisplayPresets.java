@@ -10,6 +10,7 @@ import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.be.beweather.weatherdata.WeatherImageProvider;
 import com.be.beweather.weatherdata.WeatherReport;
 
 
@@ -37,9 +38,7 @@ public class WeatherDisplayPresets  {
 
 
 
-    public void exitAnimation(
-
-    ) {
+    public void exitAnimation() {
 
 
         objectAnimator = ObjectAnimator.ofFloat(cardView, "x", -600);
@@ -53,6 +52,7 @@ public class WeatherDisplayPresets  {
             @Override
             public void run() {
 
+                cardView.setX(55);
                 cardView.setVisibility(android.view.View.INVISIBLE);
                 cardView.removeAllViews();
             }
@@ -137,5 +137,60 @@ public class WeatherDisplayPresets  {
         //Set up gesture detector
 
     }
+
+
+    public void weatherViewVisibility_hideAddWeatherButtons() {
+        addButton.setVisibility(View.INVISIBLE);
+        newWeatherBoxButton.setVisibility(View.INVISIBLE);
+    }
+
+    public void weatherViewVisibility_showAddWeatherButtons() {
+        addButton.setVisibility(View.VISIBLE);
+        newWeatherBoxButton.setVisibility(View.VISIBLE);
+    }
+
+    public void weatherViewVisibility_showStandardView() {
+        cardView.alterViewLayout_standardView(context);
+        cardView.setVisibility(View.VISIBLE);
+        cardView.getWeatherViews_location().setVisibility(View.VISIBLE);
+        cardView.getWeatherViews_temperature().setVisibility(View.VISIBLE);
+        cardView.getWeatherIcon().setVisibility(View.VISIBLE);
+    }
+
+    public void weatherViewVisibilty_hideWeatherBox() {
+
+        cardView.setVisibility(View.INVISIBLE);
+
+        try {cardView.hideDetailsView();
+            cardView.hideStandardView();}
+        catch (Exception e) {System.out.println("No views to close.");}
+    }
+
+
+    public void weatherViewVisibility_hideStandardShowDetails() {
+        cardView.setVisibility(View.VISIBLE);
+        cardView.hideStandardView();
+        cardView.alterViewLayout_detailView(context);
+    }
+
+    public void dataBinding_standardViewSetUp(WeatherReport thisWeatherBoxWeatherReport) {
+        WeatherImageProvider weatherImageProvider = new WeatherImageProvider();
+        Integer drawableId = weatherImageProvider.getWeatherIconId(thisWeatherBoxWeatherReport);
+        Integer backgroundId = weatherImageProvider.getWeatherBackgroundId(thisWeatherBoxWeatherReport);
+        cardView.getWeatherIcon().setBackgroundResource(drawableId);
+        cardView.getStandardViewLayoutBackground().setBackgroundResource(backgroundId);
+        cardView.getWeatherViews_location().setText(
+                thisWeatherBoxWeatherReport.getLocationName_city());
+        cardView.getWeatherViews_temperature().setText(
+                thisWeatherBoxWeatherReport.getTemperature());
+
+
+    }
+
+
+
+
+
+
 
 }
