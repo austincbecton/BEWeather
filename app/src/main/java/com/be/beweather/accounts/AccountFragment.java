@@ -296,6 +296,8 @@ public class AccountFragment extends Fragment {
         stopLoadingScreen(inflatedView);
 
 
+
+
     }
 
 
