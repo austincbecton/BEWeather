@@ -172,7 +172,7 @@ public class WeatherBox {
     public void triggerAd() {
         Random rand = new Random();
         int upperbound = 10;
-        if (rand.nextInt(upperbound) < 3) {
+        if (rand.nextInt(upperbound) < 2) {
             mainActivity.triggerAd();
         }
 
@@ -413,9 +413,18 @@ public class WeatherBox {
 
     public void setThisWBoxId(String thisWBoxId) {
         this.thisWBoxId = thisWBoxId;
+
     }
 
-    public void refresh() {
+    public void refresh(String newWboxId) {
+        //first, removing city from the cache so we don't waste memory
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.remove(this.TAG_location);
+        editor.commit();
+
+        //new wbox id for saving in sharedpref
+        this.thisWBoxId = newWboxId;
+        this.TAG_location = "wBox" + thisWBoxId + "location";
         //this variable stores this box's weather data, which the views will extract
         this.thisWeatherBoxWeatherReport = new WeatherReport(sharedPref.getString(TAG_location, "empty"), "");
         this.thisWeatherBoxWeatherReport.updateWeatherReport("", "",
@@ -424,13 +433,20 @@ public class WeatherBox {
         //See if we currently have a report set up
         //checks for 'empty' because we previously set it to empty if sharedpref returns nothing
         if (this.thisWeatherBoxWeatherReport.getLocationName_city().equals("empty")) {
+            currentDisplayType = "exited";
+            weatherDisplayPresets.showAddWeatherButtons();
+            /*
             this.thisWeatherBoxWeatherReport = model.getRecentReport();
             if (this.thisWeatherBoxWeatherReport.getLocationName_city() == null) {
                 this.thisWeatherBoxWeatherReport = new WeatherReport("empty", "empty");
             }
 
+
+
             //set up observer
             observeCurrentData();
+            */
+
         } else {
 
             //Otherwise, we'll submit a new request via volley to get the latest weather data.

@@ -99,17 +99,6 @@ public class WebViewModel extends ViewModel {
     }
 
 
-    /*
-    private void setDefaultWeather() {
-        recentWeatherSearch_location.setValue("SAMPLE");
-        recentWeatherSearch_countryName.setValue("..");
-        recentWeatherSearch_humidity.setValue("..");
-        recentWeatherSearch_skyConditions.setValue("..");
-        recentWeatherSearch_temperature.setValue("..");
-    }
-
-     */
-
 
     public void setCurrentAccount(String firebaseId) {
         SharedPreferences.Editor editor = sharedPref.edit();

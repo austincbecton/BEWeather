@@ -31,6 +31,7 @@
             app:layout_constraintTop_toTopOf="parent" >
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/my_account_card_internal_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
@@ -51,7 +52,8 @@
                 <TextView
                     android:id="@+id/title_my_account_name"
                     android:layout_width="150dp"
-                    android:layout_height="30dp"
+                    android:layout_height="70dp"
+                    android:gravity="center"
                     android:text="MyName"
                     android:textAlignment="center"
                     android:textSize="16sp"
@@ -66,8 +68,9 @@
                 <TextView
                     android:id="@+id/title_my_account_level"
                     android:layout_width="150dp"
-                    android:layout_height="30dp"
+                    android:layout_height="70dp"
                     android:layout_marginTop="8dp"
+                    android:gravity="center"
                     android:text="Basic Member"
                     android:textAlignment="center"
                     android:textSize="16sp"
@@ -75,6 +78,21 @@
                     app:layout_constraintEnd_toEndOf="@+id/title_my_account_name"
                     app:layout_constraintStart_toStartOf="@+id/title_my_account_name"
                     app:layout_constraintTop_toBottomOf="@+id/title_my_account_name" />
+
+                <Button
+                    android:id="@+id/change_name_button"
+                    android:layout_width="49dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="12dp"
+                    android:backgroundTint="@color/standard_text_color"
+                    android:paddingLeft="0dp"
+                    android:paddingRight="0dp"
+                    android:text="change"
+                    android:textSize="8sp"
+                    app:layout_constraintBottom_toTopOf="@+id/title_my_account_level"
+                    app:layout_constraintStart_toEndOf="@+id/title_my_account_name"
+                    app:layout_constraintTop_toTopOf="@+id/title_my_account_name"
+                    app:layout_constraintVertical_bias="0.391" />
 
                 <com.google.android.material.navigation.NavigationView
                     android:id="@+id/account_navigation_menu"
@@ -84,6 +102,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:menu="@menu/account_options_menu"/>
+
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

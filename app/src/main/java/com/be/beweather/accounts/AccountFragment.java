@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -48,7 +49,6 @@ import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-
 public class AccountFragment extends Fragment {
 
     WebViewModel model;
@@ -63,7 +63,9 @@ public class AccountFragment extends Fragment {
             Executors.newFixedThreadPool(NUMBER_OF_THREADS);
     private static final String TAG = "AccountFragment";
     private View inflatedView;
-
+    Button change_name_button;
+    Boolean changeNameIsShowing;
+    EditText changeNameDialog;
 
 
     public Button logoutButton;
@@ -109,6 +111,7 @@ public class AccountFragment extends Fragment {
             allAccountsList = model.getAllAccounts_foruseOnBackgroundThread();
         });
 
+
     }
 
     @Override
@@ -134,6 +137,7 @@ public class AccountFragment extends Fragment {
         //Set up views
         title_my_account_name = view.findViewById(R.id.title_my_account_name);
         title_my_account_level = view.findViewById(R.id.title_my_account_level);
+        changeNameIsShowing = false;
 
 
         /**
@@ -176,7 +180,11 @@ public class AccountFragment extends Fragment {
                     System.out.println("Accounts test: allAccountsList item: "+ nextAccount.getFirebaseId());
 
                     if (nextAccount.getFirebaseId().equals(currentAccountId)) {
-                        thisAccount = nextAccount;
+                        StormAccount retrievedAccount = new StormAccount();
+                        retrievedAccount.setNickname(nextAccount.getNickname());
+                        retrievedAccount.setFirebaseId(nextAccount.getFirebaseId());
+                        retrievedAccount.setMembership(nextAccount.getMembership());
+                        thisAccount = retrievedAccount;
                     }
                 }
 
@@ -229,9 +237,73 @@ public class AccountFragment extends Fragment {
         });
 
 
+        change_name_button = view.findViewById(R.id.change_name_button);
+        change_name_button.setOnClickListener(View -> {
+            alterFunctionality_change_name_button(view);
+
+        });
+
+        try {thisAccount.getFirebaseId();}
+        catch(Exception e) {
+            for (StormAccount nextAccount : allAccountsList) {
+                System.out.println("Searching accts: " + nextAccount.getFirebaseId());
+
+                if (nextAccount.getFirebaseId().equals(model.getCurrentAccountFromModel())) {
+                        StormAccount newAccount = setUpNewAccount();
+                        newAccount.setFirebaseId(user.getUid());
+                        newAccount.setNickname("noName");
+                        newAccount.setMembership("basic");
+                        thisAccount = newAccount;
+                    }
+
+            }
+        }
+
+
+        //At end of onViewCreated, we'll double check that somebody's signed in.
+        //If not, we'll start sign in process again.
+        try {thisAccount.getFirebaseId();}
+        catch(Exception e) {
+            checkCurrentLogIn();
+        }
 
 
 
+
+
+
+
+    }
+
+    //Allows user to change their nickname
+    //Switches to an edittext, then when finished, it changes back to textview
+    private void alterFunctionality_change_name_button(View view) {
+        if (changeNameIsShowing) {
+            if (!changeNameDialog.getText().toString().isEmpty()) {
+
+                try {thisAccount.setNickname(changeNameDialog.getText().toString());}
+                catch(Exception e) {
+                    Log.e(TAG, "Error setting nickname. The account might be null.");
+                }
+                model.updateAccount(thisAccount);
+            }
+
+            changeNameDialog.setVisibility(View.INVISIBLE);
+            title_my_account_name.setVisibility(View.VISIBLE);
+            title_my_account_name.setText(thisAccount.getNickname());
+            changeNameIsShowing = false;
+
+
+        }
+        else {
+
+            changeNameDialog = new EditText(getContext());
+            changeNameDialog.setLayoutParams(title_my_account_name.getLayoutParams());
+            title_my_account_name.setVisibility(android.view.View.INVISIBLE);
+            ConstraintLayout my_account_card_internal_layout = view.findViewById(R.id.my_account_card_internal_layout);
+            my_account_card_internal_layout.addView(changeNameDialog);
+            changeNameIsShowing = true;
+        }
     }
 
     private final ActivityResultLauncher<Intent> signInLauncher = registerForActivityResult(
@@ -253,9 +325,16 @@ public class AccountFragment extends Fragment {
             boolean foundAccount = false;
             try {
                 for (StormAccount nextAccount : allAccountsList) {
-                    if (nextAccount.getFirebaseId().equals(user.getUid())) {
+                    if (nextAccount.getFirebaseId().equals(FirebaseAuth.getInstance().getUid())) {
                         model.setCurrentAccount(nextAccount.getFirebaseId());
                         foundAccount = true;
+
+                        StormAccount newAccount = setUpNewAccount();
+                        newAccount.setFirebaseId(nextAccount.getFirebaseId());
+                        newAccount.setNickname(nextAccount.getNickname());
+                        newAccount.setMembership(nextAccount.getMembership());
+                        thisAccount = newAccount;
+
                         break;
                     }
                 }
@@ -268,6 +347,10 @@ public class AccountFragment extends Fragment {
             if (!foundAccount) {
                 //Use set up new account method so we can then save it in database and model
                 StormAccount newAccount = setUpNewAccount();
+                newAccount.setFirebaseId(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                newAccount.setNickname("noName");
+                newAccount.setMembership("basic");
+                thisAccount = newAccount;
                 model.saveAccountInStormDatabase(newAccount);
                 model.setCurrentAccount(newAccount.getFirebaseId());
                 backgroundWriteExecutor.execute(()->{
@@ -282,7 +365,7 @@ public class AccountFragment extends Fragment {
 
         }
 
-        try {model.setCurrentAccount(user.getUid());}
+        try {model.setCurrentAccount(FirebaseAuth.getInstance().getUid());}
         catch(Exception e) {
             Log.e(TAG, "error getting user.getUid");
             try {
@@ -365,11 +448,24 @@ public class AccountFragment extends Fragment {
 
         if (model.getCurrentAccountFromModel() != null) {
             Log.i(TAG, "Current user acc to model: " + model.getCurrentAccountFromModel());
-            Log.i(TAG, "Current user acc to firebase user variable: "+user.getUid());
+            Log.i(TAG, "Current user acc to firebase user variable: "+ FirebaseAuth.getInstance().getUid());
 
-            if (model.getCurrentAccountFromModel().equals(user.getUid())) {
+            if (model.getCurrentAccountFromModel().equals(FirebaseAuth.getInstance().getUid())) {
                 //TODO: Update local account information with firebase
                 stopLoadingScreen(inflatedView);
+                backgroundWriteExecutor.execute(() -> {
+                    allAccountsList = model.getAllAccounts_foruseOnBackgroundThread();
+                    for (StormAccount account : allAccountsList) {
+                        if (account.getFirebaseId().equals(user.getUid())) {
+                            StormAccount retrievedAccount = new StormAccount();
+                            retrievedAccount.setNickname(account.getNickname());
+                            retrievedAccount.setFirebaseId(account.getFirebaseId());
+                            retrievedAccount.setMembership(account.getMembership());
+                            thisAccount = retrievedAccount;
+
+                        }
+                    }
+                });
 
                 return true;
             } else {
@@ -399,7 +495,7 @@ public class AccountFragment extends Fragment {
     private StormAccount setUpNewAccount() {
         StormAccount account = new StormAccount();
         account.setFirebaseId(FirebaseAuth.getInstance().getUid());
-        try {account.setNickname(user.getDisplayName());} catch (Exception e) {System.out.println("Error getting user.getDisplayName in acct frag");}
+        try {account.setNickname(FirebaseAuth.getInstance().getUid());} catch (Exception e) {System.out.println("Error getting user.getDisplayName in acct frag");}
         if (account.getNickname() == null) {
             account.setNickname("no name set");
         }

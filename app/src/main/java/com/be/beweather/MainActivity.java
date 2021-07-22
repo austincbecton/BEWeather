@@ -194,8 +194,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
-
         if (user == null) {
             System.out.println("user is null, so opening account fragment");
             openAccountFragment();
@@ -273,6 +271,9 @@ public class MainActivity extends AppCompatActivity {
             weatherBox1.setWeatherBoxDisplay(WeatherBox.MODE_INVISIBLE);
             weatherBox2.setWeatherBoxDisplay(WeatherBox.MODE_INVISIBLE);
             weatherBox3.setWeatherBoxDisplay(WeatherBox.MODE_INVISIBLE);
+            enterWeatherButton.setVisibility(View.INVISIBLE);
+            weatherSearchBar.setVisibility(View.INVISIBLE);
+
 
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction transaction = fragmentManager.beginTransaction();
@@ -285,10 +286,35 @@ public class MainActivity extends AppCompatActivity {
 
     public void closeAccountFragment() {
         if (ACCOUNT_FRAG_ON) {
+
             ACCOUNT_FRAG_ON = false;
+            String wBoxId_1;
+            String wBoxId_2;
+            String wBoxId_3;
+
+            try {
+
+                wBoxId_1 = "wBox1"+model.getCurrentAccountFromModel();
+                wBoxId_2 = "wBox2"+model.getCurrentAccountFromModel();
+                wBoxId_3 = "wBox3"+model.getCurrentAccountFromModel();
+
+            } catch (Exception e) {
+
+                wBoxId_1 = "wBox1"+"temporary";
+                wBoxId_2 = "wBox2"+"temporary";
+                wBoxId_3 = "wBox3"+"temporary";
+            }
+
+            weatherBox1.setThisWBoxId(wBoxId_1);
+            weatherBox1.setThisWBoxId(wBoxId_2);
+            weatherBox1.setThisWBoxId(wBoxId_3);
+
+
             weatherBox1.alternateDisplayType();
             weatherBox2.alternateDisplayType();
             weatherBox3.alternateDisplayType();
+            enterWeatherButton.setVisibility(View.VISIBLE);
+            weatherSearchBar.setVisibility(View.VISIBLE);
 
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction transaction = fragmentManager.beginTransaction();
@@ -299,42 +325,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    //Sometimes the views show through on the accountfragment.
-    //This will check to make sure the weather views are not visible.
-    public void checkForBugsWithView() {
-        if (ACCOUNT_FRAG_ON) {
 
-
-        }
-    }
-
-/*
-
-    public void refreshWeatherBoxes() {
-        String wBoxId_1;
-        String wBoxId_2;
-        String wBoxId_3;
-
-        try {
-
-            wBoxId_1 = "wBox1"+model.getCurrentAccountFromModel();
-            wBoxId_2 = "wBox2"+model.getCurrentAccountFromModel();
-            wBoxId_3 = "wBox3"+model.getCurrentAccountFromModel();
-
-        } catch (Exception e) {
-
-            wBoxId_1 = "wBox1"+"temporary";
-            wBoxId_2 = "wBox2"+"temporary";
-            wBoxId_3 = "wBox3"+"temporary";
-        }
-
-
-        weatherBox1 = new WeatherBox(this, this, controller, model, weatherSearchBar, weatherBoxView1, newWeatherBoxButton_1, addButton_1, wBoxId_1);
-        weatherBox2 = new WeatherBox(this, this, controller, model, weatherSearchBar, weatherBoxView2, newWeatherBoxButton_2, addButton_2, wBoxId_2);
-        weatherBox3 = new WeatherBox(this, this, controller, model, weatherSearchBar, weatherBoxView3, newWeatherBoxButton_3, addButton_3, wBoxId_3);
-    }
-
- */
 
 
 }

@@ -193,6 +193,18 @@ public class WeatherDisplayPresets  {
 
 
 
+    public void showAddWeatherButtons() {
+
+        //cardView.setX(55);
+        cardView.setVisibility(android.view.View.INVISIBLE);
+        cardView.removeAllViews();
+        newWeatherBoxButton.setVisibility(View.VISIBLE);
+        addButton.setVisibility(View.VISIBLE);
+
+
+
+
+    }
 
 
 
